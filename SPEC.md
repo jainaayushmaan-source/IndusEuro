@@ -2,13 +2,17 @@
 
 Single source of truth for Claude Code (CLAUDE.md) and Codex (AGENTS.md). Both agents build the same thing from this file. If a task file and this spec disagree, this spec wins.
 
-Last updated: 5 Oct 2026, from team meeting notes and Q&A with Aayushmaan.
+Last updated: 11 Oct 2026. §5.10 (6 Oct) and §5.11 (9 Oct) were added from review rounds on the prototype. Original version: 5 Oct 2026, from team meeting notes and Q&A with Aayushmaan.
+
+**Reference prototype:** `prototype/prepnivo-prototype.html` is a working single-file prototype of the whole product. It is the agreed reference for screens and behaviour. If this spec and the prototype disagree, this spec wins; log the difference in `DECISIONS.md`. Its "Prototype tools" panel is for review only and is not part of the product.
+
+**Later sections win.** §5.10 and §5.11 replace earlier rules where they conflict. For example, §5.11 replaces the test builder in §5.6 and the tabs in §5.7. Phase text in CLAUDE.md and AGENTS.md that disagrees with them is out of date.
 
 ---
 
 ## 1. What we are building
 
-A **standalone, runnable desktop web app** for the **parent side** of PrepNivo, based on the live structure at prepnivo.com/dashboard. The child side is out of scope, apart from the child-login setup that parents do during onboarding.
+A **standalone, runnable desktop web app** for the **parent side** of PrepNivo, based on the live structure at prepnivo.com/dashboard. It also includes a **public home page** (§5.10) and a **child app at `/kid`** (§5.11.10) that plays what parents assign and writes results back to the parent side. The child app is frontend-only with mock data, always uses the light theme, and has no AI.
 
 | Area | Real or mock |
 |---|---|
@@ -16,6 +20,8 @@ A **standalone, runnable desktop web app** for the **parent side** of PrepNivo, 
 | Stripe checkout | **Frontend mock.** "Redirecting to Stripe…" then a Stripe-style mock checkout page, then success, cancel or fail. |
 | Payment management | **Custom in-app screen** with mock data. Not the Stripe Customer Portal. |
 | Dashboard, progress, tests, questions, AI generation | **Frontend with seeded realistic data.** AI generation is mocked with canned output and a simulated delay. |
+| AI usage billing (tokens, top-ups) | **Frontend mock.** Usage is estimated and recorded in client state; top-ups create mock invoices. |
+| Child app (`/kid`) | **Frontend mock** on the same seed data. Results update the parent side. |
 
 Target: **desktop 1440×900** first. It must not break at 1280 wide. Tablet and mobile are not in scope.
 
@@ -96,6 +102,7 @@ Keep this visual language: mint-green background, white cards, green primary, ro
 | **Parent-made test** | **Same as drills** |
 | Platform challenge | Higher rate |
 | **Parent-made challenge** | **Same as platform challenges** |
+| **Olympiad paper** (§5.11.6) | **Same as drills** |
 
 Parent tests may include **locked chapters**. Show a "Locked for Aarav" tag on those chapters, but allow them.
 
@@ -113,14 +120,23 @@ Parent tests may include **locked chapters**. Show a "Locked for Aarav" tag on t
 ## 4. Information architecture (parent)
 
 ```
+Public (logged out)                                            §5.10
+  /home               public home: features, how it works, pricing, safety, FAQ
+  /goodbye            after account deletion
+  /maintenance        planned maintenance
+  /error              server error page with a reference code
+  (unknown routes)    "We couldn't find that page" (public frame, or in-app when logged in)
+
 Auth (logged out)
   /welcome            choose: Parent / Child login
+  /child-login        redirects to /kid/login
   /signup             parent account
   /verify             email OTP (2FA)
   /login              email + password, then /verify
   /forgot, /reset     password reset (mock email link)
 
 Onboarding (logged in, no child yet, or "Add child")
+  /onboarding/start          registration welcome after email is verified (§5.10)
   /onboarding/child          1 child details
   /onboarding/class          2 class content breakdown (subjects, chapters)
   /onboarding/plan           3 course details + price (yearly/monthly)
@@ -128,13 +144,15 @@ Onboarding (logged in, no child yet, or "Add child")
   /onboarding/review         5 cart, grouped by currency
   /checkout/redirect         "Redirecting to Stripe…"
   /checkout/stripe-mock      Stripe-style mock checkout
-  /checkout/success | /checkout/cancelled | /checkout/failed
+  /checkout/success | /checkout/cancelled | /checkout/failed[?reason=declined|funds|expired|auth]
+  /checkout/pending          connection lost during payment: "Don't pay again" (§5.10)
 
 App shell (sidebar + top bar)
   Sidebar:  [Logo] [Child switcher]
             Overview · Weak topics · Tests · New questions · Settings
   Top bar:  breadcrumb · notification bell (badge) · theme toggle · avatar menu
             + "Create more questions" button (top right, ONLY on Tests and New questions)
+  Avatar menu: Account · Settings (→ /settings/children) · Log out      (§5.11.8)
 
   /overview
   /overview/subject/[id]
@@ -142,24 +160,37 @@ App shell (sidebar + top bar)
   /overview/subject/[id]/chapter/[id]/topic/[id]
   /weak-topics
   /weak-topics/[topicId]
-  /tests                      list: Assigned · In progress · Completed
-  /tests/new                  test builder
-  /tests/[id]                 test detail + results
-  /questions                  tabs: My content · Platform content · AI generated
-  /questions/import           PDF / photo / text, then AI drafts, then review
-  /questions/generate         AI generator (questions or challenge)
-  /questions/review           review queue
+  /tests                      list: Assigned · In progress · Completed; filter by type and subject (§5.11.6)
+  /tests/new                  builder: Subject test (4 steps) or Olympiad paper (3 steps) (§5.11.5–6)
+  /tests/[id]                 test detail + results (paper questions hidden until the child finishes)
+  /questions                  one list of the parent's own questions, with source symbols (§5.11.2–3)
+  /questions/import           PDF / photo / text, then AI drafts, then review (?paper=1: complete paper)
+  /questions/generate         AI generator for the child selected in the sidebar (questions or challenge)
+  /questions/review           opens /questions with the review pop-up open (§5.11.4)
   /settings/account
   /settings/security          password, 2FA (always on), active sessions
   /settings/children          list · edit · reset child login · change class · remove
   /settings/children/[id]/change-class
   /settings/buddy-requests
-  /settings/billing           custom Stripe management
+  /settings/billing           custom Stripe management + AI usage and top-ups (§5.11.7)
   /settings/billing/invoices
   /settings/appearance        Light · Dark · System
   /settings/feedback
   /access-paused              shown for a child past the grace period
+
+Child app (always light theme, no AI)                          §5.11.10
+  /kid                        → /kid/home if signed in, else /kid/login
+  /kid/login                  "Who's practising today?": the device's family, pick avatar
+  /kid/login/[childId]        picture code (Grade/Klasse 1–4) or PIN (5–10)
+  /kid/home                   tests from the parent · Keep going · subjects · badges · streak · points
+  /kid/subject/[id]           chapters: drill, then challenge; locked chapters
+  /kid/play                   question player (drill, challenge, test, paper)
+  /kid/result                 score, points, unlocks, tricky ones
+  /kid/buddies                friend code, add a buddy, buddies, waiting for a grown-up
+  /kid/paused                 the child's access is paused
 ```
+
+`/styleguide` (Phase 0) stays as a development route. It is not linked from any product menu.
 
 ---
 
@@ -308,6 +339,280 @@ App shell (sidebar + top bar)
 
 Every screen has loading (skeletons that resolve), empty states that tell the parent what to do next, and errors that say what went wrong and how to fix it. Toasts use the same verb as the button that triggered them ("Assign test" → "Test assigned").
 
+### 5.10 Public home, registration, and network / session / payment edge cases (added 6 Oct 2026)
+
+**Public home (`/home`).** The default route when logged out (`/` → `/home`, or `/overview` when logged in).
+- Top bar: logo; section links (How it works · Pricing · Safety · FAQ) that scroll; "Log in" (→ /welcome) and "Create account" (→ /signup).
+- Hero: headline, one-line pitch, both buttons, "CBSE / NCERT Grade 1–10 · Berlin Klasse 1–10", and Nivo.
+- Four feature cards: Overview, Weak topics, Tests, New questions.
+- How it works: 3 numbered steps (create account, add each child, follow along and help).
+- Pricing: one card per curriculum, from `config/pricing.ts`: yearly price, monthly price, the yearly saving, auto-renew, and the 1-month grace period. EUR shows "Euro prices to be confirmed".
+- Safety: email 2FA for parents; no AI for children; you approve every AI question; buddies need your OK.
+- FAQ (accordion): more than one child; class change mid-year; failed payment; does my child use AI; how children sign in.
+- Footer: Log in · Child sign-in (→ /kid/login) · Terms · Privacy.
+
+**Registration welcome (`/onboarding/start`).** Shown right after the sign-up OTP is verified.
+- Nivo, an "Email verified" badge, and "Welcome, <first name>! Your account is ready".
+- "You'll need": the child's name and date of birth, their class, and a card. Show the price per child in the parent's currency.
+- "Add my first child" starts onboarding. "I'll do this later" logs out and shows the notice "Your account is saved. Log in any time to add your first child."
+- A logged-in parent with no children who opens an app route goes to `/onboarding/child`.
+
+**First-run card on Overview.** New accounts get a "Getting started with <child>" card with a progress bar and 4 steps:
+1. Set up the child's login on their device (show the login card).
+2. The child finishes a first drill.
+3. Set a first test.
+4. Try the AI question generator.
+
+Each step shows "Done" or an action. The card can be hidden. If any children in the cart are unpaid, an alert says "<names> is waiting for payment" with "Finish checkout".
+
+**Sign-up, login and password edge cases**
+- Sign-up keeps everything typed when there's an error.
+- If the email already has an account, show an inline message with "Log in" and "reset your password" links.
+- Suggest corrections for common email-domain typos ("Did you mean …@gmail.com?").
+- The password must not contain the email's local part. Password fields have a Show/Hide toggle.
+- Logging in with an email whose sign-up was never confirmed sends a new sign-up code and shows "You started signing up with this email but didn't confirm it."
+- Login: 5 wrong passwords lock that email for 15 minutes ("Too many attempts. Try again in N minutes, or reset your password.").
+- OTP: at most 5 codes per email per hour. /verify shows "Can't find it? Check your spam folder" and a "Send a new code" button when the code has expired.
+- Password reset: the link works once, for 1 hour. An expired or used link shows "This link has expired" with "Send a new link".
+  - The new password must differ from the old one.
+  - A reset logs the parent out on all devices. The login screen then says "Password changed. You were logged out on all devices."
+- Changing the email or password needs an OTP (in a pop-up). The email change sends the code to the new address.
+
+**Session**
+- Idle for 30 minutes: logout. On the next action, go to /login with "For your security, you were logged out after 30 minutes without activity." After login, return to the page they were on (but never back into onboarding or checkout).
+- Logging out in one tab logs out every tab: "You logged out in another tab or window."
+
+**Network and server errors.** Every server-backed action goes through one API layer.
+- **Offline:**
+  - Show a sticky banner: "You're offline. Pages you've opened still work. Logging in, paying, saving and AI need a connection." It has a "Try again" button.
+  - Lists that haven't loaded yet show "You're offline, so this can't load" with "Try again".
+  - Coming back online shows the toast "Back online" and reloads lists.
+- **Failed actions:**
+  - Buttons are disabled with a spinner while an action runs, which prevents double submits.
+  - A failed action shows the toast "Couldn't <action>. <reason>" and keeps what the parent typed.
+  - Use these reasons:
+    - offline: "No internet connection. Check your Wi-Fi or mobile data, then try again."
+    - server: "Something went wrong on our side. Please try again in a minute."
+- **Lists that fail to load** show "We couldn't load this list" with how to fix it and "Try again".
+- **Browser storage blocked:** show the banner "This browser is blocking storage, so changes won't be kept after you close the tab."
+- **Server error page (`/error`):** "Something went wrong", "Your data is safe", an error reference ("PN-XXXXXX") to quote to support, then "Try again" and "Go to overview" (or "Go to home").
+- **Maintenance (`/maintenance`):** "PrepNivo is getting an update", the time we'll be back in CET and IST, "Your children's progress is safe".
+- **Page not found:** logged in, show it inside the app shell; logged out, show it in the public frame with "Go to home" and "Log in".
+
+**Onboarding validation**
+- **Child details**
+  - First name is required, 40 characters at most.
+  - Date of birth is required and can't be in the future. Ages under 4 or over 17 are rejected with a reason.
+  - Don't allow the same first name and date of birth twice in the family or cart.
+  - An account can have up to 6 children ("Contact support if you need more").
+- **Class:** if the class doesn't match the age (more than 1 year off), show a non-blocking warning: "<child> is 11. Most children this age are in Grade 5–6. Check you've picked the right class."
+- **Picture code:** 3–6 animals.
+- **Username:** 3–20 letters, numbers or dots, unique within the family.
+- **PIN:** exactly 4 digits.
+  - Reject easy PINs: repeated digits, 1234, 4321, 1212, 0123, 2580, 9876.
+  - Reject the child's birth year.
+- Classes without confirmed chapter data show their subjects with "Chapters to be confirmed".
+
+**Checkout edge cases**
+- `/checkout/redirect` while offline: "We couldn't reach Stripe. You haven't been charged, and your cart is saved."
+- An already-paid checkout (back button or refresh) shows "This checkout is already paid. You won't be charged again."
+- The mock checkout handles these outcomes:
+  - success
+  - 3-D Secure confirmation ("Confirm with your bank")
+  - card declined
+  - insufficient funds
+  - expired card
+  - authentication failed
+  - connection lost during payment
+
+  The failed page names the reason and the fix. The prototype's "Test scenario" picker is for review only.
+- Connection lost while paying → `/checkout/pending`:
+  - "We're confirming your payment … **Don't pay again.** We'll show the result here, and email you either way."
+  - "Check payment status" resolves it to success or failed.
+- Success with another currency still unpaid: "You still have a Germany (EUR) checkout to complete for <names>", with "Continue".
+
+**Delete account.** In Settings › Account, under a "Delete account" danger zone.
+- Explain the effect: every child's progress, tests and questions are deleted, and all subscriptions are cancelled with no refund for the current period.
+- Type `DELETE` to confirm, then enter an email OTP.
+- Then go to `/goodbye` ("Your account is deleted … A confirmation is on its way to your email").
+
+### 5.11 Third round: questions, tests, Olympiad papers, AI billing, child app (added 9 Oct 2026)
+
+This section replaces the conflicting parts of §5.6 (test builder) and §5.7 (tabs, review queue, generator child picker).
+
+#### 5.11.1 AI generator: no child picker
+- `/questions/generate` has no child field. It uses the child selected in the sidebar, and says "For <child> · <class>" with "To make questions for another child, switch child in the sidebar."
+- The fields are: subject, chapter, topic, difficulty, count (5/10/20), question types, and "Match this weak topic". "Match this weak topic" is enabled only when the topic is weak for this child.
+  - Locked chapters are labelled "(locked for <child>)".
+- A link with `?topic=` for another child's class switches the sidebar to that child.
+- Classes without a syllabus show an empty state, because AI can't write questions for them yet.
+- After generating, go to the review pop-up (§5.11.4).
+
+#### 5.11.2 New questions: one list, source symbols
+- There is **no Platform content tab anywhere**, including the "Add from my questions" picker in the test builder. Parents never browse PrepNivo's question bank.
+- "My content" and "AI generated" are **one list**: the parent's own questions for the selected child's class.
+- Each row shows a **source symbol only** (icon with a tooltip and an accessible label):
+  - **sparkles** = AI generated
+  - **file** = from an uploaded file (tooltip: "From <file name>")
+  - **pencil** = added by the parent
+- A legend under the page title explains the three symbols.
+- Page actions: "Upload a file", "Generate with AI", "Add question".
+- Rows have Edit, Delete and Add to test. Bulk select supports "Add to test" and "Delete".
+- Deleting a question used by an unfinished test warns that the test keeps a copy.
+
+#### 5.11.3 Organising your own questions
+- **Sort:** newest first (default), oldest first, by subject and chapter, or by topic A–Z.
+- **Filters:**
+  - subject / chapter / topic / text search
+  - source (all, added by you, AI generated, from a file)
+  - file name
+  - date added: any, today, last 7 days, last 30 days, or "Choose dates" (from–to, not after today)
+- **"Your uploads" chips:** one per file, showing the file name, number of questions and last date. Clicking a chip filters by that file; clicking again clears it.
+- Show "N questions shown of M", "Clear filters", and an empty state for "No questions match".
+
+#### 5.11.4 Review pop-up (replaces the review queue page)
+- New and generated questions open in a **review pop-up**, newest on top.
+  - Each draft shows its source symbol, its origin (e.g. "Generated · <topic>" or "Uploaded <file>") and its time.
+  - Each draft has **Approve · Edit · Discard**.
+  - The header has **Approve selected (N)** and **Approve all N**.
+- Edit opens the question editor and returns to the pop-up.
+- When everything is reviewed, show "All reviewed".
+- `/questions/review` opens `/questions` with the same pop-up open.
+- While drafts are waiting, `/questions` shows an alert with "Review now".
+- Nothing reaches a child until it's approved. A challenge or uploaded paper is assigned only once **every** draft in it is reviewed. The toast says "Challenge assigned" or "Paper assigned".
+
+#### 5.11.5 Tests: one subject, up to 15 questions
+- **One subject per test.** A test has at most **15 questions**.
+- **Step 1, Setup:**
+  - Type toggle: Subject test or Olympiad paper (see §5.11.6).
+  - Subject: subjects without questions are marked "(no questions yet)".
+  - Title: defaults to "<Subject> test, <date>".
+  - Number of questions: 5 / 10 / 15.
+  - Difficulty: easy / medium / hard / mixed.
+  - Due date: from today onwards.
+  - Timing: untimed, or timed with 5–180 minutes.
+  - Shows "For <child> · <class>".
+- **Step 2, "What this <subject> test covers":** topics are **picked automatically**.
+  - **Order:** the child's weak topics in this subject; then the topics of the current (newest unlocked) chapter; then topics practised in the last 14 days; then other unlocked chapters.
+  - Pick **up to 4 topics**, from **unlocked chapters only**. Skip topics that have no questions.
+  - Each topic shows **why it was picked**: Weak topic · Current chapter · Practised recently · Chosen by you.
+  - Summary tiles: questions (N of count), topics, chapters, points.
+  - The table shows each topic's chapter, the child's score and its number of questions.
+  - **The parent can change topics** under "Change topics". This is a tree for this subject only. Locked chapters are selectable and tagged "Locked for <child>".
+  - "Pick topics automatically again" restores the automatic choice.
+  - If there aren't enough questions, a warning suggests adding the parent's own or generating some.
+- **Step 3, Questions:** PrepNivo questions are **auto-picked** for the chosen topics.
+  - The parent sees **only the questions in this test**, never the platform bank.
+  - For each question they can **remove** it, **replace** it, reorder it (drag or arrow buttons), or **add** more.
+  - Adding uses one **"Add from my questions"** button. It opens a picker of the parent's own questions in this subject (search, "Only this test's topics"), newest first, and stops at 15.
+  - **Replace** offers another PrepNivo question on the same topic, or one of the parent's own questions from the same subject (same topic first).
+  - A removed PrepNivo question isn't picked again for this test.
+- **Step 4, Review:** questions, time (timed, or an estimate), points (drill rate), title, subject, due date, difficulty and topics. Topics from locked chapters get a note. Then **Assign test**.
+- **Adding from elsewhere.** "Add to test" from New questions adds to the current draft (creating one if needed). Questions from another subject, or beyond 15, are **skipped with a message**: "N skipped: tests have one subject", "N skipped: max 15 per test".
+- **Pre-filled entry points:**
+  - "Set a practice test on this" and "Retest weak topics" open step 2 pre-filled.
+  - A retest avoids the original test's questions.
+- The tests list shows a draft banner: "You have a draft: … Continue building".
+- An unstarted test or paper can be removed.
+
+#### 5.11.6 Olympiad papers
+- **What they are:** complete, timed papers, possibly multi-subject, split into sections. Examples: Logical reasoning, Mathematical reasoning, Everyday mathematics, Achievers section.
+- **Setting one** (the builder's "Olympiad paper" type has 3 steps: Setup → Paper overview → Review):
+  - The parent picks a paper from the class's **catalogue**. Each paper shows its question count, minutes and subjects, with a "Multi-subject" badge where relevant.
+  - Or they **upload a whole paper**: `/questions/import?paper=1`, with the "This is a complete question paper" option, a paper title, and the time allowed (10–180 minutes).
+    - The AI reads it into drafts, grouped into sections by subject.
+    - The parent reviews every draft. The paper is assigned once every draft is reviewed.
+- **Hidden questions:** the parent **can't see paper questions until the child finishes**. Before that, they see the sections and question counts and "Questions are hidden for now".
+  - After completion, they see score by section, accuracy by topic, and the questions with the child's answers.
+  - Retest isn't offered for papers.
+- **Points:** papers earn points at the **drill rate**.
+- **Tests list:** filter by type (All · Subject tests · Olympiad papers · Challenges) and by subject, on top of the Assigned / In progress / Completed tabs.
+  - Rows show "Challenge" or "Olympiad paper" badges.
+  - Multi-subject tests show "Multi-subject".
+  - Points show as earned, or as "up to N".
+
+#### 5.11.7 AI usage billing (Settings › Billing › "AI question tools")
+- **Included:** **50,000 tokens a month per active child** (paused children don't count), included in the subscription. This is not a separate AI plan.
+- **Top-ups** add tokens to the current month and expire at the monthly reset:
+
+  | Tokens | INR | EUR |
+  |---|---|---|
+  | 50,000 | ₹79 | €0.99 (placeholder, `// TODO confirm`) |
+  | 200,000 | ₹249 | €2.99 (placeholder, `// TODO confirm`) |
+
+  - The currency follows the parent's country.
+  - Buying a top-up needs a card for that currency, and opens a confirmation pop-up.
+  - **Every top-up creates an invoice** ("AI top-up · 50,000 tokens") in the invoices table.
+- **Automatic top-up:** optional and **off by default**. When on and tokens run out, we add the smallest pack automatically, with an invoice.
+- **Usage meter:**
+  - Shows used / allowance (%), tokens left and the reset date.
+  - Turns amber at 80% and red at 100%.
+  - Also shows: included tokens (per child × children), top-ups, questions drafted, files and photos read.
+- **Usage history:** a table of date and time, action ("Generated questions", "Read a file", "Read a photo", "Read pasted text"), details and tokens.
+- **Explainer** ("What the AI does"):
+  - What the AI does: writes syllabus-matched questions, reads worksheets, photos, papers and notes into drafts, and targets weak topics.
+  - Every draft waits for the parent's approval. Children never use AI.
+  - **What a token is:** about 450 per question, about 6,000 per one-page worksheet, and about 2,600 per photo.
+- **Every AI action shows its estimated token cost** before it runs. This covers the generator and the upload; the generator panel also shows a compact meter and links to usage.
+  - When the estimate is more than what's left (and automatic top-up is off), the action is **blocked**. Show "Not enough tokens left this month" with a **"Buy tokens"** button.
+- **At 80% usage**, a notification appears on the bell ("You've used N% of this month's AI tokens"; at 100%, "You have no AI tokens left this month"). It links to Billing.
+
+#### 5.11.8 Profile (avatar) menu
+- Shows the parent's name and email, then **only**: Account (→ Settings › Account), **Settings** (→ **Settings › Children**) and Log out.
+- **The style guide is removed from all product menus.**
+
+#### 5.11.9 Recent sessions: several per day
+- When a day has several sessions, the details panel shows one card per session in time order: **"Session 1 · 4:10 pm"**, "Session 2 · …".
+  - Each card has the type badge, title and subject, minutes, score (`correct / total`), points and its mistakes.
+  - The panel header totals the day's sessions, minutes and points.
+- The 14-day strip shows **×N** under days with more than one session.
+
+#### 5.11.10 Child app (`/kid`)
+The child app is **always light theme**, with **no AI anywhere**: no hints, AI explanations, AI buttons or AI wording. It is styled for children, with large type and buttons; the 14px minimum still applies.
+
+- **Sign-in (device-linked family)**
+  - The device belongs to the family of the last parent who logged in on it.
+  - If no parent has logged in on the device yet, show "This device isn't set up yet" with "Parent log in".
+  - "Who's practising today?": the child picks their **avatar**.
+  - Then they enter their code:
+    - Grade/Klasse 1–4: a **picture code** (tap the animals in order, with Undo).
+    - Grade/Klasse 5–10: a **4-digit PIN** on a keypad (keyboard digits work too).
+  - **5 wrong tries lock that child's sign-in for 5 minutes** ("Too many tries. Ask a grown-up to help, or wait N minutes"). From 2 tries left, the screen warns how many are left.
+  - "That's not me" goes back. "I'm a parent" goes to the parent login.
+  - A paused child goes to `/kid/paused` ("PrepNivo is paused for now … all your progress is safe").
+- **Home**
+  - Greeting with Nivo and the streak.
+  - **"From your parent":** tests, challenges and papers that aren't completed, sorted by due date. Each shows "Was due" when late, plus Start or Carry on.
+  - **"Keep going":** a drill for the current chapter.
+  - Subjects with mastery bars.
+  - Badges: First drill · 3-day streak · 500 points · Challenge done · First test · 1,000 points.
+  - The header shows points, streak, avatar, Home, Buddies and Log out.
+- **Subject page:** a list of chapters.
+  - Locked chapters show "Finish chapter N to unlock". Chapters without content show "Coming soon".
+  - Unlocked chapters have **Drill** (10 questions) and **Challenge** (8 questions, double points).
+  - **A challenge unlocks after the drill** (best drill score ≥ 60%).
+  - **Scoring ≥ 70% on the newest unlocked chapter's drill unlocks the next chapter.**
+- **Player**
+  - Header: the progress bar, "Question N of M", and either a timer or a type chip.
+  - **Drills and challenges give feedback after each question:** Check, then "Correct! +N points" or "Not quite. The answer is …". The explanation is shown without any AI wording.
+  - **Tests and papers give no feedback.** The child can go Back and Next freely. Paper questions show their section.
+  - **Timed** tests and papers show a countdown, and finish automatically at 0:00 ("Time's up!").
+  - **Finishing with blank answers asks for confirmation:** "You've answered N of M … Finish now?"
+  - **Quit:** a drill's answers are discarded. A test goes back to Assigned, and its answers are not kept.
+- **Result page:** an encouraging headline, the score `correct / total`, points, any chapter unlocked, and "Let's look at the tricky ones" with the child's answer and the correct one.
+- **Results write back to the parent side:**
+  - The test is completed with its answers and score.
+  - A session is added for today, with its time, minutes, score, points and mistakes.
+  - Topic stats are updated (attempts, correct, last practised, last wrong, missed types, recent wrong answers).
+  - Chapter unlocks are recorded.
+  - Weak topics, Overview and Tests update from these, using the same selectors.
+- **Offline:** results are **queued on the device** and the result page says "You're offline. Your score is saved on this device and will be sent when you're back online." They **sync automatically** when back online ("Your score is saved").
+- **Buddies**
+  - The child's **friend code** (format `ABC-1234`) with "A grown-up has to say yes before you become buddies".
+  - "Add a buddy" takes a friend's code and validates it: wrong format, own code, unknown code, already buddies or already asked.
+  - **Adding a buddy creates a pending request for the parent** in Settings › Buddy requests (with badges and the Overview alert). The child sees it under "Waiting for a grown-up".
+  - Approved buddies are listed.
+
 ---
 
 ## 6. Design system
@@ -423,6 +728,19 @@ Every screen has loading (skeletons that resolve), empty states that tell the pa
 - Picture login: 3 animals (fox, owl, turtle).
 - Weak topic: Das Einmaleins › 7er- und 8er-Reihe.
 
+**Added in §5.11 (match the prototype's seed):**
+- Every session has a start time. Some days have 2 or more sessions, e.g. Aarav yesterday and 4 days ago, and Anaya 3 days ago.
+- Questions from uploaded files:
+  - "Fractions worksheet.pdf" (3 questions, Aarav)
+  - "Magnets notes.jpg" (2 questions, Aarav)
+  - "Einmaleins Arbeitsblatt.pdf" (1 question, Anaya)
+- Every question has a `createdAt` timestamp.
+- AI usage history for October 2026: 5 entries, about 19,300 tokens in total. Automatic top-up is off and there are no top-ups.
+- Olympiad paper catalogue:
+  - Grade 6: Maths Level 1, Science Level 1, Multi-subject.
+  - Klasse 3: Mathe-Olympiade Übungsrunde.
+- Friend codes the prototype recognises: RIA-5520 (Ria P., Grade 6), LEO-3391 (Leo M., Klasse 3), ZOE-8812 (Zoe K., Grade 5), KAB-6271 (Kabir S., Grade 6).
+
 The team should verify curriculum details; keep them in `/data/curricula/*.ts` so they're easy to edit.
 
 ---
@@ -448,3 +766,25 @@ The team should verify curriculum details; keep them in `/data/curricula/*.ts` s
 - [ ] No text anywhere is under 14px.
 - [ ] Every list has loading, empty and error states.
 - [ ] Playwright flows pass.
+
+**§5.10: public home, registration, edge cases**
+- [ ] `/home` is the logged-out default, with features, how it works, pricing from `config/pricing.ts`, safety and FAQ.
+- [ ] After the sign-up OTP, `/onboarding/start` welcomes the parent. "I'll do this later" logs out with a notice. New accounts see the first-run "Getting started" card.
+- [ ] Login locks for 15 minutes after 5 wrong passwords. Reset links work once, for 1 hour, and log out all devices. 30 minutes idle logs out and returns to the same page after login. Logging out in one tab logs out the others.
+- [ ] Offline shows the banner and offline list states. Failed actions keep the input and show "Couldn't …" toasts. Buttons can't be double-submitted. `/error`, `/maintenance` and the not-found page exist.
+- [ ] Onboarding rejects invalid ages, duplicate children, more than 6 children, weak PINs and duplicate usernames, and warns when the age and class don't match.
+- [ ] Checkout handles 3-D Secure, the decline reasons, offline redirect, already-paid, and connection lost (`/checkout/pending`, "Don't pay again").
+- [ ] Delete account needs `DELETE` plus an OTP, cancels every subscription and ends on `/goodbye`.
+
+**§5.11: third round**
+- [ ] The AI generator has no child picker. It says "For <child> · <class>" and follows the sidebar.
+- [ ] There is no Platform content tab anywhere. New questions is one list with source symbols (sparkles / file with the file name as a tooltip / pencil).
+- [ ] Your own questions are newest first, with every sort (newest, oldest, subject/chapter, topic) and every filter (subject/chapter/topic/search, source, file, date range), plus "Your uploads" chips.
+- [ ] New and generated questions open in the review pop-up (newest on top; Approve / Edit / Discard, Approve selected, Approve all). `/questions/review` opens the pop-up.
+- [ ] A test has one subject and at most 15 questions. Step 2 auto-picks up to 4 topics from unlocked chapters (weak, then current chapter, then last 14 days), each with its reason, and the parent can change them.
+- [ ] Step 3 shows only the test's questions: remove, replace (same-topic PrepNivo question or the parent's own from the same subject), and one "Add from my questions" button. Other-subject and over-15 additions are skipped with a message.
+- [ ] Olympiad papers: pick one from the catalogue or upload one (assigned after every draft is reviewed). Questions stay hidden from the parent until the child finishes. Drill-rate points. The tests list filters by type and subject.
+- [ ] AI billing shows 50,000 tokens a month per active child, ₹79/₹249 top-ups (EUR placeholders marked TODO), automatic top-up off by default, a meter, history and the explainer. Every AI action shows its estimate and is blocked with "Buy tokens" when tokens run out. A notification appears at 80%. Top-ups create invoices.
+- [ ] The avatar menu is exactly Account · Settings (→ Settings › Children) · Log out. The style guide isn't in any product menu.
+- [ ] Days with several sessions show numbered "Session N · time" cards, and the day strip shows ×N.
+- [ ] Child app: sign-in on a device-linked family (avatar, then picture code or PIN, with a 5-minute lock after 5 wrong tries); home; subject drills; challenge unlocks at ≥60%; next chapter unlocks at ≥70%; feedback only for drills and challenges; timer; confirmation before finishing with blanks; results write back (queued offline, synced online); buddy requests reach the parent; always light; no AI.
