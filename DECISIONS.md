@@ -112,3 +112,17 @@ These were agreed in the prototype chat but never committed. On 11 Oct 2026 they
     - Approved buddies can see each other's badges and streaks.
     - Declined requests can be made again.
 24. **Profile menu target.** Settings in the avatar menu opens Settings › Children. `/styleguide` stays as a development route (Phase 0) but isn't linked from any product menu.
+
+## Prototype round 4 (11 Oct 2026), SPEC §5.12
+
+25. **Data-art palette.** Six tokens, `--viz-1…6`, one per subject slot in curriculum order.
+    - Light uses deep tones: #0F6E56 / #185FA5 / #854F0B / #534AB7 / #993C1D / #993556.
+    - Dark uses light tones: #5DCAA5 / #85B7EB / #FAC775 / #AFA9EC / #F0997B / #ED93B1.
+    - Measured contrast: 5.5–7.0 (light) and 7.3–11.4 (dark) on `--bg` and `--surface`.
+    - Classes with more than 6 subjects reuse colours; the hover card names the subject.
+26. **When the bloom appears.** Automatically once per app load, on the first Overview visit, so it never interrupts normal navigation. "Family view" reopens it at any time. It never appears in the child app.
+27. **The bloom replaces the earlier in-page hero.** The first draft put a particle cloud inside the Overview page. It was replaced by the full-screen bloom (feedback: "a whole-screen artifact, nothing else on the screen"). Overview keeps the same visual language through particle mastery rings on its subject cards.
+28. **Making petals easy to select.**
+    - Each subject is a separate petal with its own colour and a gap around it.
+    - Hover picks the nearest petal particle within 20 px.
+    - The rotation eases to a stop while hovering, and the other petals dim.

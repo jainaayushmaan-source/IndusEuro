@@ -154,7 +154,7 @@ App shell (sidebar + top bar)
             + "Create more questions" button (top right, ONLY on Tests and New questions)
   Avatar menu: Account · Settings (→ /settings/children) · Log out      (§5.11.8)
 
-  /overview
+  /overview                   first visit after load: full-screen family bloom (§5.12), then Overview
   /overview/subject/[id]
   /overview/subject/[id]/chapter/[id]
   /overview/subject/[id]/chapter/[id]/topic/[id]
@@ -613,6 +613,39 @@ The child app is **always light theme**, with **no AI anywhere**: no hints, AI e
   - **Adding a buddy creates a pending request for the parent** in Settings › Buddy requests (with badges and the Overview alert). The child sees it under "Waiting for a grown-up".
   - Approved buddies are listed.
 
+### 5.12 Family bloom: immersive landing on Overview (added 11 Oct 2026)
+
+- **When it shows:** the first time a parent lands on Overview after the app loads, before anything else. It covers the **whole screen**: no sidebar, top bar, alerts or prototype tools.
+- **Revisiting:** Overview has a quiet "Family view" button (top right of the content) that opens it again.
+- **What's on screen**
+  - One **3D particle flower per child**, side by side, rotating slowly.
+  - Under each flower: the child's name, class and overall mastery.
+  - A "Continue to overview" button that fades in after about 2 seconds.
+  - Nothing else.
+- **Encoding.** Each subject is one **petal in its own colour** (`--viz-1…6`, in curriculum order).
+  - Petal length and particle density = subject mastery.
+  - Particle flow speed (centre → tip) = minutes practised in that subject in the last 14 days.
+  - A muted core sits at the centre.
+  - Paused children are dimmed.
+- **Hover a petal:**
+  - The rotation eases to a stop and the other petals dim.
+  - A card shows: child and class, subject, mastery %, accuracy `correct / total` (or "No answers yet"), coverage (topics practised / total), minutes in the last 14 days, weakest topic, and last practised date.
+  - All values come from the same selectors as the rest of Overview.
+- **Click a petal:** switch to that child if needed and open `/overview/subject/[id]`.
+- **Leaving:**
+  - Continue, scrolling down, Esc, Page Down or the down arrow closes the bloom.
+  - The Overview then "lands": its sections rise and fade in one after another.
+- **The Overview uses the same visual language:** the subject cards and the subject drill-down card show mastery as **particle rings** in the subject's colour, with a muted track for the remainder.
+- **Theme and contrast:**
+  - The canvas is transparent on `--bg` in light and dark. Colours come only from tokens.
+  - `--viz-*` must reach 3:1 on `--bg` and `--surface` in both themes, and is part of the contrast check.
+  - Normal (not additive) blending keeps every subject's colour distinct where particles overlap.
+- **Accessibility:**
+  - The bloom is a modal dialog with focus on Continue.
+  - A visually hidden table lists every child × subject with mastery, accuracy, coverage and minutes.
+  - With reduced motion: no rotation, no flow and no landing animation.
+- **Performance:** about 9,000 particles at 50–60 fps on a 1440×900 screen.
+
 ---
 
 ## 6. Design system
@@ -788,3 +821,10 @@ The team should verify curriculum details; keep them in `/data/curricula/*.ts` s
 - [ ] The avatar menu is exactly Account · Settings (→ Settings › Children) · Log out. The style guide isn't in any product menu.
 - [ ] Days with several sessions show numbered "Session N · time" cards, and the day strip shows ×N.
 - [ ] Child app: sign-in on a device-linked family (avatar, then picture code or PIN, with a 5-minute lock after 5 wrong tries); home; subject drills; challenge unlocks at ≥60%; next chapter unlocks at ≥70%; feedback only for drills and challenges; timer; confirmation before finishing with blanks; results write back (queued offline, synced online); buddy requests reach the parent; always light; no AI.
+
+**§5.12: family bloom**
+- [ ] On the first Overview visit after load, the family bloom fills the whole screen with nothing else on it. "Family view" opens it again.
+- [ ] Each child has a 3D rotating particle flower with one distinctly coloured petal per subject (length and density = mastery, flow = recent minutes).
+- [ ] Hovering a petal pauses the rotation and shows the full subject card. Clicking opens that subject for the right child.
+- [ ] Continue, scrolling, Esc, Page Down or the down arrow lands on Overview. The subject cards use matching particle mastery rings.
+- [ ] `--viz-*` tokens pass 3:1 on `--bg` and `--surface` in both themes. The canvas is transparent. Reduced motion is respected, and a hidden table gives the same data.
