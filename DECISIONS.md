@@ -130,3 +130,10 @@ These were agreed in the prototype chat but never committed. On 11 Oct 2026 they
     - The flowers are always one scroll up from anywhere on Overview, and scrolling down morphs them into the 8-week mastery chart.
     - Only the first Overview visit per app load starts at the flowers; later visits start at the chart, so normal navigation isn't slowed down.
     - The sidebar and top bar are hidden while the flowers fill the screen and fade in as the chart lands.
+30. **Nothing clickable overlaps (12 Oct 2026).**
+    - The 8-week chart uses one lane per subject, so lines never cross and each lane is a full-height target.
+    - On the flowers, hover picks the front-most petal near the pointer. Petals respond only while the flowers are on screen, and lanes only once the chart has landed.
+    - The prototype tools sit in the sidebar foot (or the bottom-left corner with page padding).
+    - The offline banner is in the page flow, not floating.
+    - Show password sits beside the field.
+    - An automated audit of every parent, child, public and login screen at 1440 and 1280 found no remaining overlaps, apart from the accepted cases in SPEC §6.

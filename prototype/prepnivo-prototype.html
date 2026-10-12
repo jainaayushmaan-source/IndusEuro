@@ -408,12 +408,15 @@ details.acc ol { margin: 0; padding: 0 16px 16px 44px; font-size: 15px; line-hei
 .chart .s1 { stroke: var(--chart-1); fill: none; stroke-width: 3; } .chart .p1 { fill: var(--chart-1); }
 .chart .s2 { stroke: var(--chart-2); fill: none; stroke-width: 3; stroke-dasharray: 7 5; } .chart .p2 { fill: var(--chart-2); }
 .chart .lbl { fill: var(--text); font-weight: 700; }
-.dev-fab { position: fixed; right: 20px; bottom: 20px; z-index: 80; }
-.dev-panel { position: absolute; right: 0; bottom: 56px; width: 320px; }
+/* Prototype tools sit in the sidebar foot (inside the app) or the bottom-left corner with page padding (elsewhere), so they never cover a control. */
+.dev-fab { position: fixed; left: 16px; bottom: 16px; z-index: 80; }
+.app .sidebar { padding-bottom: 76px; }
+body:not(:has(.app)) #app { padding-bottom: 88px; }
+.dev-panel { position: absolute; left: 0; bottom: 56px; width: 320px; }
 .print-only { display: none; }
 .login-card { border: 2px dashed var(--border-strong); border-radius: 16px; padding: 24px; display: flex; gap: 20px; align-items: center; background: var(--surface); max-width: 520px; }
 /* system banners, busy state, home (added 6 Oct 2026) */
-.sysbar { position: fixed; left: 16px; bottom: 16px; z-index: 85; max-width: 620px; display: flex; gap: 12px; align-items: center; padding: 12px 16px; border-radius: 12px; border: 2px solid var(--danger); background: var(--danger-soft); color: var(--text); font-size: 15px; line-height: 22px; box-shadow: var(--shadow); }
+.sysbar { position: relative; margin: 12px 16px; z-index: 85; display: flex; gap: 12px; align-items: center; padding: 12px 16px; border-radius: 12px; border: 2px solid var(--danger); background: var(--danger-soft); color: var(--text); font-size: 15px; line-height: 22px; box-shadow: var(--shadow); }
 .sysbar > .ic { color: var(--danger); flex: 0 0 auto; }
 .sysbar.warn { border-color: var(--warning); background: var(--warning-soft); } .sysbar.warn > .ic { color: var(--warning); }
 body.is-busy { cursor: progress; }
@@ -492,7 +495,7 @@ body.is-busy::before { content: ''; position: fixed; top: 0; left: 0; height: 4p
 }
 /* ============ Family bloom (SPEC §5.12): scroll-driven flower → chart. Transparent; tokens only. ============ */
 .bloom-spacer { height: calc(100vh - 104px); }
-.bloom-plot { height: 320px; margin-top: 16px; }
+.bloom-plot { height: 380px; margin-top: 16px; }
 .bloom-layer { position: fixed; inset: 0; z-index: 15; pointer-events: none; display: none; }
 .bloom-layer canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .app .sidebar, .app .topbar { opacity: var(--chrome, 1); transition: opacity .15s linear; }
@@ -1572,7 +1575,7 @@ const NOTICES = {
 };
 function noticeHtml() { const n = S.notice && NOTICES[S.notice]; return n ? `<div class="alert info mt16" role="status">${ic(n[0], 22)}<div class="t-cap grow">${n[1]}</div></div>` : ''; }
 function togglePw(id, btn) { const el = document.getElementById(id); const show = el.type === 'password'; el.type = show ? 'text' : 'password'; btn.textContent = show ? 'Hide' : 'Show'; btn.setAttribute('aria-pressed', show); }
-const pwInput = (id, ac, extra = '') => `<div style="position:relative"><input class="input" id="${id}" type="password" autocomplete="${ac}" style="padding-right:84px" ${extra}><button type="button" class="btn btn-ghost btn-sm" style="position:absolute;right:6px;top:6px" aria-pressed="false" aria-label="Show password" onclick="togglePw('${id}',this)">Show</button></div>`;
+const pwInput = (id, ac, extra = '') => `<div class="row" style="gap:8px;align-items:stretch"><input class="input" id="${id}" type="password" autocomplete="${ac}" style="flex:1;min-width:0" ${extra}><button type="button" class="btn btn-secondary" style="flex:0 0 auto;min-width:80px" aria-pressed="false" aria-label="Show password" onclick="togglePw('${id}',this)">Show</button></div>`;
 const TYPO_DOMAINS = { 'gmial.com': 'gmail.com', 'gmal.com': 'gmail.com', 'gmail.co': 'gmail.com', 'gmail.con': 'gmail.com', 'gamil.com': 'gmail.com', 'hotmial.com': 'hotmail.com', 'yahooo.com': 'yahoo.com', 'yaho.com': 'yahoo.com', 'outlok.com': 'outlook.com', 'gmx.dee': 'gmx.de', 'web.dee': 'web.de' };
 function emailHint(el) {
   const v = el.value.trim().toLowerCase(); const dom = v.split('@')[1]; const fix = dom && TYPO_DOMAINS[dom]; const box = document.getElementById('email-hint'); if (!box) return;
@@ -3105,7 +3108,7 @@ function familyHero() {
 /* The card the flowers land in. */
 function bloomDock() {
   const d = BLOOM.data; const wl = weekLabels();
-  return `<section class="card mt24 bloom-dock" id="bloom-dock" aria-labelledby="bd-h"><div class="row between wrap"><div><h2 class="h3" id="bd-h">Mastery over the last 8 weeks</h2><p class="t-cap muted">One line per subject, in the same colours as the family view. Hover over a line for details.</p></div>
+  return `<section class="card mt24 bloom-dock" id="bloom-dock" aria-labelledby="bd-h"><div class="row between wrap"><div><h2 class="h3" id="bd-h">Mastery over the last 8 weeks</h2><p class="t-cap muted">One lane per subject, in the same colours as the family view. Hover over a lane for details, click to open the subject.</p></div>
     <button class="btn btn-ghost btn-sm" onclick="bloomToTop()">${ic('up', 16)}Family view</button></div>
     <div id="bloom-plot" class="bloom-plot"></div>
     <table class="sr"><caption>Mastery by week, child and subject</caption><thead><tr><th>Child</th><th>Subject</th>${wl.map(l => `<th>${l}</th>`).join('')}</tr></thead><tbody>${d.flatMap(k => k.subs.map(s => `<tr><td>${esc(k.first)}</td><td>${esc(s.name)}</td>${s.trend.map(v => `<td>${v}%</td>`).join('')}</tr>`)).join('')}</tbody></table></section>`;
@@ -3178,7 +3181,10 @@ function bloomFrame(t) {
   /* chart frame: the plot rect inside the card, split per child */
   const R0 = plot.getBoundingClientRect(); const land = p < 1 ? window.scrollY - bloomDist() : 0;
   const R = { left: R0.left, width: R0.width, top: R0.top + land, bottom: R0.bottom + land, height: R0.height }; const gap = 32; const pw = (R.width - gap * (n - 1)) / n;
-  const panel = ki => { const x0 = R.left + ki * (pw + gap); return { x0, l: x0 + 44, r: x0 + pw - 8, t: R.top + 34, b: R.bottom - 30 }; };
+  const panel = ki => { const x0 = R.left + ki * (pw + gap); return { x0, l: x0 + 132, r: x0 + pw - 8, t: R.top + 34, b: R.bottom - 30 }; };
+  /* One lane per subject: lines never cross, and each lane is its own hover/click target. */
+  const lane = (P, ns, i) => { const lh = (P.b - P.t) / ns; return { t: P.t + i * lh + 4, b: P.t + (i + 1) * lh - 4, lh }; };
+  const LY = (P, ns, i, v) => { const Ln = lane(P, ns, i); return Ln.b - (Ln.b - Ln.t) * v / 100; };
   const X = (P, wk) => P.l + (P.r - P.l) * wk / 7, Y = (P, v) => P.b - (P.b - P.t) * v / 100;
   const x = cv.getContext('2d'); x.setTransform(d, 0, 0, d, 0, 0); x.clearRect(0, 0, W, H);
   if (p >= .999) { x.save(); x.beginPath(); x.rect(R.left - 4, Math.max(72, R.top - 40), R.width + 8, R.bottom - Math.max(72, R.top - 40) + 6); x.clip(); }
@@ -3189,7 +3195,13 @@ function bloomFrame(t) {
     data.forEach((k, ki) => { const P = panel(ki);
       x.globalAlpha = axA; x.fillStyle = BLOOM.text; x.font = '700 15px Nunito, sans-serif'; x.textAlign = 'left'; x.fillText(`${k.first} · ${k.cls}`, P.x0, P.t - 14);
       x.font = '500 14px "Nunito Sans", sans-serif'; x.fillStyle = BLOOM.muted;
-      [0, 50, 100].forEach(v => { x.globalAlpha = axA * .55; x.strokeStyle = BLOOM.border; x.lineWidth = 1; x.beginPath(); x.moveTo(P.l, Y(P, v) + .5); x.lineTo(P.r, Y(P, v) + .5); x.stroke(); x.globalAlpha = axA; x.textAlign = 'right'; x.fillText(v + '%', P.l - 8, Y(P, v) + 5); });
+      const ns = k.subs.length; const on = BLOOM.hit && BLOOM.hit.ki === ki && BLOOM.hit.wk != null ? BLOOM.hit.s.i : -1;
+      k.subs.forEach((s, i) => { const Ln = lane(P, ns, i);
+        if (i === on) { x.globalAlpha = axA * .08; x.fillStyle = BLOOM.cols[i % VIZ_N]; x.fillRect(P.x0, Ln.t - 3, P.r - P.x0, Ln.b - Ln.t + 6); }
+        x.globalAlpha = axA * .45; x.strokeStyle = BLOOM.border; x.lineWidth = 1; x.beginPath(); x.moveTo(P.l, Math.round(Ln.b) + .5); x.lineTo(P.r, Math.round(Ln.b) + .5); x.stroke();
+        x.globalAlpha = axA; x.fillStyle = BLOOM.cols[i % VIZ_N]; x.beginPath(); x.arc(P.x0 + 5, (Ln.t + Ln.b) / 2, 5, 0, Math.PI * 2); x.fill();
+        x.fillStyle = BLOOM.text; x.textAlign = 'left'; let nm = s.name; while (x.measureText(nm).width > 76 && nm.length > 3) nm = nm.slice(0, -2) + '…';
+        x.fillText(nm, P.x0 + 16, (Ln.t + Ln.b) / 2 + 5); x.fillStyle = BLOOM.muted; x.textAlign = 'right'; x.fillText(s.m + '%', P.l - 10, (Ln.t + Ln.b) / 2 + 5); });
       x.textAlign = 'center'; [0, 2, 4, 7].forEach(j => x.fillText(wl[j], X(P, j), P.b + 22));
     });
     x.textAlign = 'left';
@@ -3203,19 +3215,22 @@ function bloomFrame(t) {
     const X1 = P3[0] * cr - P3[2] * sr, Z1 = P3[0] * sr + P3[2] * cr; const Y2 = P3[1] * ct - Z1 * st, Z2 = P3[1] * st + Z1 * ct;
     const f = 3.4 / (3.4 + Z2); const fx = cx + X1 * S * f, fy = cy - Y2 * S * f + S * .18;
     const Pn = panel(q.ki); const wk = q.u * 7;
-    const gx = X(Pn, wk), gy = q.core ? Pn.b : Y(Pn, trendAt(q.s.trend, wk)) + q.w * 2.4;
+    const gx = X(Pn, wk), gy = q.core ? Pn.b : LY(Pn, q.ns, q.s.i, trendAt(q.s.trend, wk)) + q.w * 1.8;
     const e = smooth(clamp01(p * 1.3 - (q.core ? 0 : q.u * .3)));
     const sx = fx + (gx - fx) * e, sy = fy + (gy - fy) * e;
     q.z = Z2 * (1 - e); q.e = e;
     if (p >= .999 && dy) for (let j = 1; j < q.h.length; j += 2) q.h[j] -= dy;
     q.h.push(sx, sy); if (q.h.length > 18) q.h.splice(0, 2);
-    const key = q.core ? `${q.ki}-c` : `${q.ki}-${q.s.i}`; let g = groups.get(key); if (!g) { g = { ps: [], z: 0, p0: q }; groups.set(key, g); } g.ps.push(q); g.z += q.z;
-    if (!q.core && mode === 'flower' && BLOOM.mx >= 0) { const dd = (sx - BLOOM.mx) ** 2 + (sy - BLOOM.my) ** 2; if (dd < best) { best = dd; hit = { ki: q.ki, s: q.s }; } }
+    const key = q.core ? `${q.ki}-c` : `${q.ki}-${q.s.i}`; let g = groups.get(key); if (!g) { g = { ps: [], z: 0, p0: q, near: null }; groups.set(key, g); } g.ps.push(q); g.z += q.z;
+    if (!q.core && p < .15 && BLOOM.mx >= 0) { const dd = (sx - BLOOM.mx) ** 2 + (sy - BLOOM.my) ** 2; if (dd < 400 && (g.near == null || dd < g.near)) g.near = dd; }
   });
-  if (mode === 'chart' && BLOOM.mx >= 0 && p > .9) {
-    data.forEach((k, ki) => { const P = panel(ki); if (BLOOM.mx < P.l - 6 || BLOOM.mx > P.r + 6 || BLOOM.my < P.t - 10 || BLOOM.my > P.b + 10) return;
-      const wk = clamp01((BLOOM.mx - P.l) / (P.r - P.l)) * 7;
-      k.subs.forEach(s => { const dd = Math.abs(Y(P, trendAt(s.trend, wk)) - BLOOM.my); if (dd < 14 && dd * dd < best) { best = dd * dd; hit = { ki, s, wk: Math.round(wk) }; } }); });
+  /* Flower: among petals with a particle within 20 px, the front-most petal wins (petals behind it can't steal the click). */
+  if (p < .15 && BLOOM.mx >= 0) { let bz = Infinity; groups.forEach(g => { if (g.near == null || g.p0.core) return; const z = g.z / g.ps.length; if (z < bz) { bz = z; hit = { ki: g.p0.ki, s: g.p0.s }; } }); }
+  /* Chart: the lane under the pointer is the hit, so every subject is equally easy to reach. Only once the chart has landed. */
+  if (p >= .999 && BLOOM.mx >= 0) {
+    data.forEach((k, ki) => { const P = panel(ki); if (BLOOM.mx < P.x0 || BLOOM.mx > P.r + 6 || BLOOM.my < P.t || BLOOM.my >= P.b) return;
+      const i = Math.min(k.subs.length - 1, Math.floor((BLOOM.my - P.t) / ((P.b - P.t) / k.subs.length)));
+      hit = { ki, s: k.subs[i], wk: Math.round(clamp01((BLOOM.mx - P.l) / (P.r - P.l)) * 7) }; });
   }
   BLOOM.hit = hit;
   [...groups.values()].sort((a, b) => b.z / b.ps.length - a.z / a.ps.length).forEach(g => {
@@ -3228,8 +3243,8 @@ function bloomFrame(t) {
     g.ps.forEach(q => { const h = q.h; if (h.length < 4) return; x.moveTo(h[0], h[1]); for (let j = 2; j < h.length; j += 2) x.lineTo(h[j], h[j + 1]); }); x.stroke();
     x.globalAlpha = (q0.core ? .6 : .92) * dim; g.ps.forEach(q => { const h = q.h; x.fillRect(h[h.length - 2] - .75, h[h.length - 1] - .75, 1.5, 1.5); });
   });
-  if (BLOOM.hit && BLOOM.hit.wk != null) { const P = panel(BLOOM.hit.ki); const hx = X(P, BLOOM.hit.wk), hy = Y(P, BLOOM.hit.s.trend[BLOOM.hit.wk]);
-    x.globalAlpha = .5; x.strokeStyle = BLOOM.border; x.beginPath(); x.moveTo(hx + .5, P.t); x.lineTo(hx + .5, P.b); x.stroke(); x.globalAlpha = 1; x.fillStyle = BLOOM.cols[BLOOM.hit.s.i % VIZ_N]; x.beginPath(); x.arc(hx, hy, 5, 0, Math.PI * 2); x.fill(); }
+  if (BLOOM.hit && BLOOM.hit.wk != null) { const P = panel(BLOOM.hit.ki); const hx = X(P, BLOOM.hit.wk), hy = LY(P, data[BLOOM.hit.ki].subs.length, BLOOM.hit.s.i, BLOOM.hit.s.trend[BLOOM.hit.wk]); const Lh = lane(P, data[BLOOM.hit.ki].subs.length, BLOOM.hit.s.i);
+    x.globalAlpha = .5; x.strokeStyle = BLOOM.border; x.beginPath(); x.moveTo(hx + .5, Lh.t); x.lineTo(hx + .5, Lh.b); x.stroke(); x.globalAlpha = 1; x.fillStyle = BLOOM.cols[BLOOM.hit.s.i % VIZ_N]; x.beginPath(); x.arc(hx, hy, 5, 0, Math.PI * 2); x.fill(); }
   if (p >= .999) x.restore();
   x.globalAlpha = 1;
   /* names under each flower and the "See progress" cue fade out as the morph begins */

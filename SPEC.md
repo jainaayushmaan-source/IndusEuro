@@ -617,7 +617,7 @@ The child app is **always light theme**, with **no AI anywhere**: no hints, AI e
 
 - **Where it lives:** the top of Overview is a full-screen stage. At the top of the page only the flowers show: the sidebar, top bar and prototype tools are hidden, and they fade back in as the chart lands.
 - **First visit vs. later visits:** the first Overview visit after the app loads starts at the flowers. Later visits start at the chart, and the flowers are always **one scroll up** from anywhere on Overview. The chart card also has a "Family view" button that scrolls back up.
-- **Scroll morph:** scrolling down turns each petal into that subject's **mastery line over the last 8 weeks**, in the same colour (from `M.masteryTrend`, the same selector as the subject page). There is one chart per child, side by side. The particles land in the "Mastery over the last 8 weeks" card (axes 0–100% and week labels), which then scrolls with the page. Scrolling up reverses the morph.
+- **Scroll morph:** scrolling down turns each petal into that subject's **mastery line over the last 8 weeks**, in its own lane (lines never cross; the whole lane is the hover and click target), in the same colour (from `M.masteryTrend`, the same selector as the subject page). There is one chart per child, side by side. The particles land in the "Mastery over the last 8 weeks" card (axes 0–100% and week labels), which then scrolls with the page. Scrolling up reverses the morph.
 - **What's on screen**
   - One **3D particle flower per child**, side by side, rotating slowly.
   - Under each flower: the child's name, class and overall mastery.
@@ -670,6 +670,7 @@ The child app is **always light theme**, with **no AI anywhere**: no hints, AI e
 - Sidebar: 264px. Content max-width: 1200px. 8px spacing grid.
 - Card radius: 16px. Input and button radius: 12px.
 - Charts must stay legible: axis labels at least 14px, never rely on colour alone, and include a legend.
+- **No two clickable elements may overlap**, including canvas hit areas. Each data series gets its own non-overlapping area (lanes, petals). Floating tools or banners never cover a control. Inline controls (like Show password) sit beside the field, not inside it. The only accepted exceptions are by design: a sticky top bar over scrolled content, an open popover or modal above the page, and content inside a collapsed section.
 
 ### Colour tokens (CSS variables; Tailwind maps to these)
 
@@ -825,5 +826,6 @@ The team should verify curriculum details; keep them in `/data/curricula/*.ts` s
 - [ ] On the first Overview visit after load, the family bloom fills the whole screen with nothing else on it. "Family view" opens it again.
 - [ ] Each child has a 3D rotating particle flower with one distinctly coloured petal per subject (length and density = mastery, flow = recent minutes).
 - [ ] Hovering a petal pauses the rotation and shows the full subject card. Clicking opens that subject for the right child.
+- [ ] No two clickable elements overlap anywhere, including chart lanes and petals. Checked by an automated audit of every screen at 1440 and 1280.
 - [ ] Scrolling down morphs each petal into its subject's 8-week mastery line (one chart per child) in the "Mastery over the last 8 weeks" card. Scrolling up returns to the flowers from anywhere on Overview. Later visits start at the chart. The subject cards use matching particle mastery rings.
 - [ ] `--viz-*` tokens pass 3:1 on `--bg` and `--surface` in both themes. The canvas is transparent. Reduced motion is respected, and a hidden table gives the same data.
