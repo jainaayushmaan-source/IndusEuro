@@ -490,32 +490,30 @@ body.is-busy::before { content: ''; position: fixed; top: 0; left: 0; height: 4p
   .print-area, .print-area * { visibility: visible; }
   .print-area { position: absolute; left: 0; top: 0; }
 }
-/* ============ Full-screen family bloom (SPEC §5.12). Only the flowers on screen; canvas is transparent on --bg. ============ */
-.bloom { position: fixed; inset: 0; z-index: 900; background: var(--bg); animation: bl-in .9s ease both; }
-.bloom canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-.bloom.leaving { animation: bl-out .75s cubic-bezier(.4, 0, .2, 1) both; pointer-events: none; }
-body.bloom-open { overflow: hidden; }
-body.bloom-open .dev-fab { display: none; }
-.bloom .bl-name { position: absolute; transform: translateX(-50%); text-align: center; pointer-events: none; }
-.bloom .bl-child { font: 800 28px/34px Nunito, sans-serif; color: var(--text); }
-.bloom .bl-meta { font-size: 15px; line-height: 22px; color: var(--text-muted); margin-top: 2px; }
-.bloom .bl-go { position: absolute; left: 50%; bottom: 28px; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 8px; background: none; border: 1px solid var(--border-strong); color: var(--text); border-radius: 999px; padding: 10px 20px; font: 600 15px/22px 'Nunito Sans', sans-serif; cursor: pointer; opacity: 0; animation: bl-in .8s ease 2.4s both; }
-.bloom .bl-go:hover { background: var(--primary-soft); }
-.bloom .bl-tip { position: absolute; z-index: 2; pointer-events: none; display: none; min-width: 250px; max-width: 310px; background: var(--surface); color: var(--text); border: 1px solid var(--border-strong); border-radius: 16px; padding: 14px 16px; box-shadow: var(--shadow); }
-.bloom .bl-tip h3 { font: 700 18px/26px Nunito, sans-serif; margin: 0 0 6px; display: flex; align-items: center; gap: 8px; }
-.bloom .bl-tip h3 i { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
-.bloom .bl-tip dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; margin: 0; font-size: 15px; line-height: 22px; }
-.bloom .bl-tip dt { color: var(--text-muted); } .bloom .bl-tip dd { margin: 0; font-weight: 600; }
-.bloom .bl-open { margin-top: 8px; font-size: 14px; line-height: 20px; color: var(--primary-strong); font-weight: 700; }
-@keyframes bl-in { from { opacity: 0; } to { opacity: 1; } }
-@keyframes bl-out { to { opacity: 0; transform: scale(1.06); } }
-@keyframes pn-land { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
-.content.landing > * { animation: pn-land .8s cubic-bezier(.2, .7, .2, 1) both; }
-.content.landing > :nth-child(2) { animation-delay: .08s; } .content.landing > :nth-child(3) { animation-delay: .16s; } .content.landing > :nth-child(4) { animation-delay: .24s; } .content.landing > :nth-child(n+5) { animation-delay: .32s; }
+/* ============ Family bloom (SPEC §5.12): scroll-driven flower → chart. Transparent; tokens only. ============ */
+.bloom-spacer { height: calc(100vh - 104px); }
+.bloom-plot { height: 320px; margin-top: 16px; }
+.bloom-layer { position: fixed; inset: 0; z-index: 15; pointer-events: none; display: none; }
+.bloom-layer canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.app .sidebar, .app .topbar { opacity: var(--chrome, 1); transition: opacity .15s linear; }
+body.chrome-off .app .sidebar, body.chrome-off .app .topbar, body.chrome-off .dev-fab { visibility: hidden; }
+.bloom-layer .bl-name { position: absolute; transform: translateX(-50%); text-align: center; }
+.bloom-layer .bl-child { font: 800 28px/34px Nunito, sans-serif; color: var(--text); }
+.bloom-layer .bl-meta { font-size: 15px; line-height: 22px; color: var(--text-muted); margin-top: 2px; }
+.bloom-layer .bl-go { position: absolute; left: 50%; bottom: 28px; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 8px; background: var(--bg); border: 1px solid var(--border-strong); color: var(--text); border-radius: 999px; padding: 10px 20px; font: 600 15px/22px 'Nunito Sans', sans-serif; cursor: pointer; animation: bl-cue 2.4s ease-in-out 1.6s infinite; }
+.bloom-layer .bl-go:hover { background: var(--primary-soft); }
+.bloom-layer .bl-tip { position: absolute; display: none; min-width: 250px; max-width: 310px; background: var(--surface); color: var(--text); border: 1px solid var(--border-strong); border-radius: 16px; padding: 14px 16px; box-shadow: var(--shadow); }
+.bloom-layer .bl-tip h3 { font: 700 18px/26px Nunito, sans-serif; margin: 0 0 6px; display: flex; align-items: center; gap: 8px; }
+.bloom-layer .bl-tip h3 i { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+.bloom-layer .bl-week { font-size: 15px; line-height: 22px; margin-bottom: 8px; }
+.bloom-layer .bl-tip dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; margin: 0; font-size: 15px; line-height: 22px; }
+.bloom-layer .bl-tip dt { color: var(--text-muted); } .bloom-layer .bl-tip dd { margin: 0; font-weight: 600; }
+.bloom-layer .bl-open { margin-top: 8px; font-size: 14px; line-height: 20px; color: var(--primary-strong); font-weight: 700; }
+@keyframes bl-cue { 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, 6px); } }
 .pring { position: relative; flex: 0 0 auto; }
 .pring canvas { display: block; width: 100%; height: 100%; }
 .pring b { position: absolute; inset: 0; display: grid; place-items: center; font: 800 15px/22px Nunito, sans-serif; color: var(--text); }
-@media (prefers-reduced-motion: reduce) { .bloom, .bloom.leaving, .bloom .bl-go, .content.landing > * { animation: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .bloom-layer .bl-go { animation: none; } .app .sidebar, .app .topbar { transition: none; } }
 @media (max-width: 1340px) { .content { padding: 24px; } .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 </style>
 </head>
@@ -2584,7 +2582,7 @@ function vOverview() {
   const sel = UI.day || (lastActive ? lastActive.d : TODAY); const selDay = days.find(d => d.d === sel) || { d: sel, acts: [] };
   const acts = selDay.acts.map(resolveAct).sort((a, b) => (a.time || '').localeCompare(b.time || ''));
   const content = `${familyHero(c)}<div class="page-head land"><div><h1 class="h2">${esc(c.first)}'s overview</h1><p class="muted">${esc(cur.label)} · ${esc(cur.board)}</p></div></div>
-  ${firstRun(c)}${alertsRow(c)}
+  ${firstRun(c)}${alertsRow(c)}${bloomDock()}
   <section class="grid g4" aria-label="Key numbers">
     ${statCard('Mastery', m.mastery, `Across ${plural(m.total, 'topic')}`)}${statCard('Accuracy', m.accuracy, m.att ? `${m.cor} / ${m.att} correct` : 'No answers yet', 'c2')}${statCard('Coverage', m.coverage, `${m.done} / ${m.total} topics practised`, 'c4')}
     <div class="card"><label class="t-ui muted" for="ov-subj">Subject drill-down</label><select class="input mt8" id="ov-subj" style="height:40px" onchange="UI.ovSubject=this.value;render()">${cur.subjects.map(s => `<option value="${s.id}" ${s.id === sid ? 'selected' : ''}>${esc(s.name)}</option>`).join('')}</select>
@@ -3070,18 +3068,19 @@ let rendering = false;
 /* ---------- prototype tools ---------- */
 
 /* =====================================================================
-   Round 4 (11 Oct 2026, SPEC §5.12): full-screen family bloom.
-   Shown on its own (nothing else on screen) when a parent first lands on Overview.
-   One 3D particle flower per child, rotating slowly. One distinct petal per subject:
-   petal length = mastery, particle density = mastery, flow speed = minutes in the last 14 days.
-   Hover pauses the rotation and shows the subject card; click opens the subject.
-   Continue (button, scroll, Enter, Esc or arrow down) lands on the Overview.
+   Round 4 (11–12 Oct 2026, SPEC §5.12): family bloom, scroll-driven.
+   The top of Overview is a full-screen stage: one rotating 3D particle flower per child,
+   one distinct petal per subject (length/density = mastery, flow = minutes in 14 days).
+   Scrolling down morphs each petal into that subject's 8-week mastery line, one chart per
+   child, landing in the "Mastery over the last 8 weeks" card. Scrolling up reverses it.
+   Sidebar and top bar are hidden at the flowers and fade in as the chart lands.
    ===================================================================== */
 const VIZ_N = 6;
 const REDUCED = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const vizVar = i => `var(--viz-${(i % VIZ_N) + 1})`;
 const fmtMin = m => m >= 60 ? `${Math.floor(m / 60)} h${m % 60 ? ' ' + (m % 60) + ' min' : ''}` : `${m} min`;
-const BLOOM = { shown: false, el: null, parts: [], sig: '', mx: -1, my: -1, hit: null, rot: 0, spin: 1, last: 0, data: [], cols: [], muted: '', colsAt: 0, pend: null };
+const BLOOM = { seen: false, layer: null, parts: [], sig: '', mx: -1, my: -1, hit: null, rot: 0, spin: 1, last: 0, lastY: 0, data: [], cols: [], muted: '', text: '', border: '', colsAt: 0, p: 0 };
+const weekLabels = () => Array.from({ length: 8 }, (_, i) => fmtShort(addDays(TODAY, -7 * (7 - i))));
 function bloomData() {
   return kids().map(k => {
     const cur = curOf(k); const days = M.sessionDays(k); const weakAll = M.weak(k);
@@ -3090,56 +3089,61 @@ function bloomData() {
       const min = days.reduce((m, d) => m + d.acts.filter(a => a.subject === s.name).reduce((q, a) => q + (a.minutes || 0), 0), 0);
       const w = weakAll.find(v => v.t.subjectId === s.id);
       const last = s.chapters.flatMap(ch => ch.topics).map(t => M.topic(k, t.id).last).filter(Boolean).sort().pop() || null;
-      return { id: s.id, name: s.name, i, m: x.mastery, cor: x.cor, att: x.att, done: x.done, total: x.total, min, weak: w ? w.t.name : null, last, tbc: !!s.tbc };
+      return { id: s.id, name: s.name, i, m: x.mastery, cor: x.cor, att: x.att, done: x.done, total: x.total, min, weak: w ? w.t.name : null, last, tbc: !!s.tbc, trend: M.masteryTrend(k, s.id) };
     });
     return { id: k.id, first: k.first, cls: clsLabel(k), paused: k.plan.status === 'paused', mastery: M.child(k).mastery, min: subs.reduce((a, b) => a + b.min, 0), subs };
   });
 }
-/* Called from the Overview template: a small entry back into the bloom, and the first-visit trigger. */
+/* Runs after the router's own hashchange handler (which scrolls to the top): later visits land on the chart, the flowers stay one scroll up. */
+window.addEventListener('hashchange', () => { if (location.hash !== '#/overview') { setChrome(1); if (BLOOM.seen) BLOOM.left = true; return; } if (BLOOM.left) setTimeout(() => window.scrollTo(0, bloomDist()), 0); });
+/* Top of the Overview template: the empty stage the flowers float over. */
 function familyHero() {
-  if (!BLOOM.shown) { BLOOM.shown = true; setTimeout(openBloom, 0); }
-  return `<div class="row mb8" style="justify-content:flex-end"><button class="btn btn-ghost btn-sm" onclick="openBloom()">${ic('overview', 16)}Family view</button></div>`;
+  BLOOM.data = bloomData();
+  BLOOM.seen = true;
+  return `<div class="bloom-spacer" id="bloom-spacer" aria-hidden="true"></div>`;
 }
-function openBloom() {
-  if (BLOOM.el || !S.session || !kids().length) return;
-  BLOOM.data = bloomData(); BLOOM.sig = ''; BLOOM.hit = null; BLOOM.mx = -1;
-  const el = document.createElement('div'); el.className = 'bloom'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-label', 'Family overview');
-  el.innerHTML = `<canvas aria-hidden="true"></canvas><div class="bl-names"></div><div class="bl-tip" role="status"></div>
-    <button class="bl-go" onclick="closeBloom()">Continue to overview ${ic('down', 18)}</button>
-    <table class="sr"><caption>Mastery by child and subject</caption><thead><tr><th>Child</th><th>Subject</th><th>Mastery</th><th>Accuracy</th><th>Coverage</th><th>Minutes, last 14 days</th></tr></thead><tbody>${BLOOM.data.flatMap(k => k.subs.map(s => `<tr><td>${esc(k.first)}</td><td>${esc(s.name)}</td><td>${s.m}%</td><td>${s.att ? `${s.cor} / ${s.att}` : 'No answers yet'}</td><td>${s.done} / ${s.total} topics</td><td>${s.min}</td></tr>`)).join('')}</tbody></table>`;
-  document.body.appendChild(el); document.body.classList.add('bloom-open'); BLOOM.el = el;
-  const cv = el.querySelector('canvas');
-  cv.addEventListener('mousemove', e => { BLOOM.mx = e.clientX; BLOOM.my = e.clientY; });
-  cv.addEventListener('mouseleave', () => { BLOOM.mx = -1; });
-  cv.addEventListener('click', () => { const h = BLOOM.hit; if (!h) return; const k = BLOOM.data[h.ki]; closeBloom(true); if (k.id !== ACC().selected) selectChild(k.id); go('/overview/subject/' + h.s.id); });
-  el.addEventListener('wheel', e => { if (e.deltaY > 20) closeBloom(); }, { passive: true });
-  BLOOM.onKey = e => { if (['Escape', 'ArrowDown', 'PageDown'].includes(e.key)) { e.preventDefault(); closeBloom(); } };
-  document.addEventListener('keydown', BLOOM.onKey);
-  setTimeout(() => { const b = el.querySelector('.bl-go'); b && b.focus({ preventScroll: true }); }, 50);
+/* The card the flowers land in. */
+function bloomDock() {
+  const d = BLOOM.data; const wl = weekLabels();
+  return `<section class="card mt24 bloom-dock" id="bloom-dock" aria-labelledby="bd-h"><div class="row between wrap"><div><h2 class="h3" id="bd-h">Mastery over the last 8 weeks</h2><p class="t-cap muted">One line per subject, in the same colours as the family view. Hover over a line for details.</p></div>
+    <button class="btn btn-ghost btn-sm" onclick="bloomToTop()">${ic('up', 16)}Family view</button></div>
+    <div id="bloom-plot" class="bloom-plot"></div>
+    <table class="sr"><caption>Mastery by week, child and subject</caption><thead><tr><th>Child</th><th>Subject</th>${wl.map(l => `<th>${l}</th>`).join('')}</tr></thead><tbody>${d.flatMap(k => k.subs.map(s => `<tr><td>${esc(k.first)}</td><td>${esc(s.name)}</td>${s.trend.map(v => `<td>${v}%</td>`).join('')}</tr>`)).join('')}</tbody></table></section>`;
 }
-function closeBloom(instant) {
-  const el = BLOOM.el; if (!el) return; BLOOM.el = null; document.removeEventListener('keydown', BLOOM.onKey);
-  document.body.classList.remove('bloom-open');
-  const main = document.querySelector('.content'); if (main && !instant) { main.classList.remove('landing'); void main.offsetWidth; main.classList.add('landing'); setTimeout(() => main.classList.remove('landing'), 1600); }
-  if (instant || REDUCED()) { el.remove(); return; }
-  el.classList.add('leaving'); setTimeout(() => el.remove(), 750);
+function bloomDist() { const sp = document.getElementById('bloom-spacer'); if (!sp) return 0; return Math.max(1, sp.getBoundingClientRect().bottom + window.scrollY - 88); }
+function bloomToTop() { window.scrollTo({ top: 0, behavior: REDUCED() ? 'auto' : 'smooth' }); }
+function bloomToChart() { window.scrollTo({ top: bloomDist(), behavior: REDUCED() ? 'auto' : 'smooth' }); }
+function bloomLayer() {
+  if (BLOOM.layer) return BLOOM.layer;
+  const el = document.createElement('div'); el.className = 'bloom-layer'; el.setAttribute('aria-hidden', 'true');
+  el.innerHTML = `<canvas></canvas><div class="bl-names"></div><div class="bl-tip"></div><button class="bl-go" tabindex="-1" onclick="bloomToChart()">See progress ${ic('down', 18)}</button>`;
+  document.body.appendChild(el); BLOOM.layer = el;
+  window.addEventListener('mousemove', e => { BLOOM.mx = e.clientX; BLOOM.my = e.clientY; }, { passive: true });
+  document.addEventListener('mouseleave', () => { BLOOM.mx = -1; });
+  document.addEventListener('click', e => {
+    const h = BLOOM.hit; if (!h || !document.getElementById('bloom-dock')) return;
+    if (e.target.closest('a,button,input,select,textarea,label,.modal-back,.popover,.sidebar,.topbar')) return;
+    const k = BLOOM.data[h.ki]; if (k.id !== ACC().selected) selectChild(k.id); go('/overview/subject/' + h.s.id);
+  });
+  return el;
 }
 function bloomColours() {
   const now = performance.now(); if (now - BLOOM.colsAt < 500 && BLOOM.cols.length) return;
-  const cs = getComputedStyle(document.documentElement); BLOOM.cols = Array.from({ length: VIZ_N }, (_, i) => cs.getPropertyValue(`--viz-${i + 1}`).trim()); BLOOM.muted = cs.getPropertyValue('--text-muted').trim(); BLOOM.colsAt = now;
+  const cs = getComputedStyle(document.documentElement);
+  BLOOM.cols = Array.from({ length: VIZ_N }, (_, i) => cs.getPropertyValue(`--viz-${i + 1}`).trim());
+  BLOOM.muted = cs.getPropertyValue('--text-muted').trim(); BLOOM.text = cs.getPropertyValue('--text').trim(); BLOOM.border = cs.getPropertyValue('--border-strong').trim(); BLOOM.colsAt = now;
 }
 function bloomBuild() {
-  const data = BLOOM.data; const sig = JSON.stringify(data.map(k => k.subs.map(s => [s.m, s.min])));
+  const data = BLOOM.data; const sig = JSON.stringify(data.map(k => [k.id, k.subs.map(s => [s.m, s.min])]));
   if (sig === BLOOM.sig) return; BLOOM.sig = sig; BLOOM.parts = [];
   data.forEach((k, ki) => {
-    for (let j = 0; j < 260; j++) BLOOM.parts.push({ ki, core: true, a: Math.random() * Math.PI * 2, r: Math.sqrt(Math.random()) * .09, y: Math.random() * .05, h: [] });
+    for (let j = 0; j < 220; j++) BLOOM.parts.push({ ki, core: true, a: Math.random() * Math.PI * 2, r: Math.sqrt(Math.random()) * .09, y: Math.random() * .05, u: Math.random(), h: [] });
     k.subs.forEach(s => {
-      const cnt = Math.round(320 + s.m * 18); const spd = .0018 + Math.min(1, s.min / 120) * .0042;
-      for (let j = 0; j < cnt; j++) BLOOM.parts.push({ ki, s, ns: k.subs.length, u: Math.random(), w: (Math.random() * 2 - 1), spd: spd * (.7 + Math.random() * .6), h: [] });
+      const cnt = Math.round(300 + s.m * 17); const spd = .0018 + Math.min(1, s.min / 120) * .0042;
+      for (let j = 0; j < cnt; j++) BLOOM.parts.push({ ki, s, ns: k.subs.length, u: Math.random(), w: Math.random() * 2 - 1, spd: spd * (.7 + Math.random() * .6), h: [] });
     });
   });
 }
-/* Petal surface in the flower's own frame (y = up). u: 0 at the centre → 1 at the tip; w: −1…1 across. */
 function petalPoint(s, ns, u, w, t) {
   const L = .42 + .58 * (s.m / 100); const span = Math.min(.56, Math.PI / ns * .9);
   const phi = s.i / ns * Math.PI * 2; const width = Math.pow(Math.sin(Math.PI * Math.min(1, u * 1.05)), .75) * span;
@@ -3148,50 +3152,101 @@ function petalPoint(s, ns, u, w, t) {
   const ripple = Math.sin(u * 7 + t * .0012 + s.i) * .012 + w * w * .03 * u;
   return [Math.cos(ang) * r, lift + ripple, Math.sin(ang) * r];
 }
+const smooth = v => v * v * (3 - 2 * v);
+const clamp01 = v => Math.max(0, Math.min(1, v));
+function trendAt(tr, wk) { const i = Math.min(6, Math.floor(wk)), f = wk - i; return tr[i] * (1 - f) + tr[i + 1] * f; }
+function setChrome(c) {
+  document.documentElement.style.setProperty('--chrome', c.toFixed(3));
+  document.body.classList.toggle('chrome-off', c < .02);
+}
 function bloomFrame(t) {
-  const el = BLOOM.el; if (!el) return; const cv = el.querySelector('canvas');
+  const dock = document.getElementById('bloom-dock'); const plot = document.getElementById('bloom-plot');
+  const el = BLOOM.layer;
+  if (!dock || !plot) { if (el) el.style.display = 'none'; if (document.body.classList.contains('chrome-off') || document.documentElement.style.getPropertyValue('--chrome') !== '1.000') setChrome(1); BLOOM.hit = null; return; }
+  const L = bloomLayer(); L.style.display = 'block'; const cv = L.querySelector('canvas');
   const d = Math.min(2, devicePixelRatio || 1); const W = innerWidth, H = innerHeight;
   if (cv.width !== Math.round(W * d) || cv.height !== Math.round(H * d)) { cv.width = Math.round(W * d); cv.height = Math.round(H * d); BLOOM.namesKey = ''; }
   bloomColours(); bloomBuild();
   const data = BLOOM.data; const n = data.length; const moving = !REDUCED();
   const dt = BLOOM.last ? Math.min(50, t - BLOOM.last) : 16; BLOOM.last = t;
-  BLOOM.spin += ((BLOOM.hit ? 0 : 1) - BLOOM.spin) * .08; if (moving) BLOOM.rot += dt * .00016 * BLOOM.spin;
+  const p = clamp01(window.scrollY / bloomDist()); BLOOM.p = p; const dy = window.scrollY - BLOOM.lastY; BLOOM.lastY = window.scrollY;
+  setChrome(clamp01((p - .55) / .4));
+  BLOOM.spin += ((BLOOM.hit && p < .5 ? 0 : 1) - BLOOM.spin) * .08; if (moving) BLOOM.rot += dt * .00016 * BLOOM.spin * (1 - p);
+  /* flower frame */
   const S = Math.min(W / n * .46, H * .5); const cy = H * .47;
-  const par = BLOOM.mx >= 0 ? (BLOOM.my / H - .5) * .25 : 0; const tilt = .62 + par; const ct = Math.cos(tilt), st = Math.sin(tilt);
+  const par = BLOOM.mx >= 0 && p < .3 ? (BLOOM.my / H - .5) * .25 : 0; const tilt = .62 + par; const ct = Math.cos(tilt), st = Math.sin(tilt);
+  /* chart frame: the plot rect inside the card, split per child */
+  const R0 = plot.getBoundingClientRect(); const land = p < 1 ? window.scrollY - bloomDist() : 0;
+  const R = { left: R0.left, width: R0.width, top: R0.top + land, bottom: R0.bottom + land, height: R0.height }; const gap = 32; const pw = (R.width - gap * (n - 1)) / n;
+  const panel = ki => { const x0 = R.left + ki * (pw + gap); return { x0, l: x0 + 44, r: x0 + pw - 8, t: R.top + 34, b: R.bottom - 30 }; };
+  const X = (P, wk) => P.l + (P.r - P.l) * wk / 7, Y = (P, v) => P.b - (P.b - P.t) * v / 100;
   const x = cv.getContext('2d'); x.setTransform(d, 0, 0, d, 0, 0); x.clearRect(0, 0, W, H);
+  if (p >= .999) { x.save(); x.beginPath(); x.rect(R.left - 4, Math.max(72, R.top - 40), R.width + 8, R.bottom - Math.max(72, R.top - 40) + 6); x.clip(); }
+  /* axes fade in as the chart forms */
+  const axA = clamp01((p - .55) / .35);
+  if (axA > 0) {
+    x.font = '500 14px "Nunito Sans", sans-serif'; const wl = weekLabels();
+    data.forEach((k, ki) => { const P = panel(ki);
+      x.globalAlpha = axA; x.fillStyle = BLOOM.text; x.font = '700 15px Nunito, sans-serif'; x.textAlign = 'left'; x.fillText(`${k.first} · ${k.cls}`, P.x0, P.t - 14);
+      x.font = '500 14px "Nunito Sans", sans-serif'; x.fillStyle = BLOOM.muted;
+      [0, 50, 100].forEach(v => { x.globalAlpha = axA * .55; x.strokeStyle = BLOOM.border; x.lineWidth = 1; x.beginPath(); x.moveTo(P.l, Y(P, v) + .5); x.lineTo(P.r, Y(P, v) + .5); x.stroke(); x.globalAlpha = axA; x.textAlign = 'right'; x.fillText(v + '%', P.l - 8, Y(P, v) + 5); });
+      x.textAlign = 'center'; [0, 2, 4, 7].forEach(j => x.fillText(wl[j], X(P, j), P.b + 22));
+    });
+    x.textAlign = 'left';
+  }
   const groups = new Map(); let best = 400, hit = null;
-  BLOOM.parts.forEach(p => {
-    const k = data[p.ki]; const cx = W * (p.ki + .5) / n; const ry = BLOOM.rot + p.ki * .9; const cr = Math.cos(ry), sr = Math.sin(ry);
-    let P;
-    if (p.core) { if (moving) p.a += .004; P = [Math.cos(p.a) * p.r, p.y, Math.sin(p.a) * p.r]; }
-    else { if (moving) { p.u += p.spd * (dt / 16); if (p.u > 1) { p.u = 0; p.w = Math.random() * 2 - 1; p.h = []; } } P = petalPoint(p.s, p.ns, p.u, p.w, t); }
-    const X1 = P[0] * cr - P[2] * sr, Z1 = P[0] * sr + P[2] * cr; const Y2 = P[1] * ct - Z1 * st, Z2 = P[1] * st + Z1 * ct;
-    const f = 3.4 / (3.4 + Z2); const sx = cx + X1 * S * f, sy = cy - Y2 * S * f + S * .18;
-    p.z = Z2; p.h.push(sx, sy); if (p.h.length > 18) p.h.splice(0, 2);
-    const key = p.core ? `${p.ki}-c` : `${p.ki}-${p.s.i}`; let g = groups.get(key); if (!g) { g = { ps: [], z: 0, p0: p }; groups.set(key, g); } g.ps.push(p); g.z += Z2;
-    if (!p.core && BLOOM.mx >= 0) { const dd = (sx - BLOOM.mx) ** 2 + (sy - BLOOM.my) ** 2; if (dd < best) { best = dd; hit = p; } }
+  const mode = p < .5 ? 'flower' : 'chart';
+  BLOOM.parts.forEach(q => {
+    const k = data[q.ki]; if (!k) return; const cx = W * (q.ki + .5) / n; const ry = BLOOM.rot + q.ki * .9; const cr = Math.cos(ry), sr = Math.sin(ry);
+    if (moving) { q.u += (q.core ? .002 : q.spd) * (dt / 16); if (q.u > 1) { q.u -= 1; if (!q.core) q.w = Math.random() * 2 - 1; q.h = []; } if (q.core) q.a += .004; }
+    const P3 = q.core ? [Math.cos(q.a) * q.r, q.y, Math.sin(q.a) * q.r] : petalPoint(q.s, q.ns, q.u, q.w, t);
+    const X1 = P3[0] * cr - P3[2] * sr, Z1 = P3[0] * sr + P3[2] * cr; const Y2 = P3[1] * ct - Z1 * st, Z2 = P3[1] * st + Z1 * ct;
+    const f = 3.4 / (3.4 + Z2); const fx = cx + X1 * S * f, fy = cy - Y2 * S * f + S * .18;
+    const Pn = panel(q.ki); const wk = q.u * 7;
+    const gx = X(Pn, wk), gy = q.core ? Pn.b : Y(Pn, trendAt(q.s.trend, wk)) + q.w * 2.4;
+    const e = smooth(clamp01(p * 1.3 - (q.core ? 0 : q.u * .3)));
+    const sx = fx + (gx - fx) * e, sy = fy + (gy - fy) * e;
+    q.z = Z2 * (1 - e); q.e = e;
+    if (p >= .999 && dy) for (let j = 1; j < q.h.length; j += 2) q.h[j] -= dy;
+    q.h.push(sx, sy); if (q.h.length > 18) q.h.splice(0, 2);
+    const key = q.core ? `${q.ki}-c` : `${q.ki}-${q.s.i}`; let g = groups.get(key); if (!g) { g = { ps: [], z: 0, p0: q }; groups.set(key, g); } g.ps.push(q); g.z += q.z;
+    if (!q.core && mode === 'flower' && BLOOM.mx >= 0) { const dd = (sx - BLOOM.mx) ** 2 + (sy - BLOOM.my) ** 2; if (dd < best) { best = dd; hit = { ki: q.ki, s: q.s }; } }
   });
-  BLOOM.hit = hit ? { ki: hit.ki, s: hit.s } : null;
+  if (mode === 'chart' && BLOOM.mx >= 0 && p > .9) {
+    data.forEach((k, ki) => { const P = panel(ki); if (BLOOM.mx < P.l - 6 || BLOOM.mx > P.r + 6 || BLOOM.my < P.t - 10 || BLOOM.my > P.b + 10) return;
+      const wk = clamp01((BLOOM.mx - P.l) / (P.r - P.l)) * 7;
+      k.subs.forEach(s => { const dd = Math.abs(Y(P, trendAt(s.trend, wk)) - BLOOM.my); if (dd < 14 && dd * dd < best) { best = dd * dd; hit = { ki, s, wk: Math.round(wk) }; } }); });
+  }
+  BLOOM.hit = hit;
   [...groups.values()].sort((a, b) => b.z / b.ps.length - a.z / a.ps.length).forEach(g => {
-    const p0 = g.p0; const k = data[p0.ki]; const on = BLOOM.hit && !p0.core && BLOOM.hit.ki === p0.ki && BLOOM.hit.s.i === p0.s.i;
-    const depth = Math.max(.45, Math.min(1, .75 - (g.z / g.ps.length) * .6));
-    const dim = (k.paused ? .35 : 1) * (BLOOM.hit && !on ? .55 : 1) * depth;
-    x.strokeStyle = x.fillStyle = p0.core ? BLOOM.muted : BLOOM.cols[p0.s.i % VIZ_N];
-    x.lineWidth = on ? 1 : .65; x.globalAlpha = (p0.core ? .25 : on ? .55 : .3) * dim; x.beginPath();
-    g.ps.forEach(p => { const h = p.h; if (h.length < 4) return; x.moveTo(h[0], h[1]); for (let j = 2; j < h.length; j += 2) x.lineTo(h[j], h[j + 1]); }); x.stroke();
-    x.globalAlpha = (p0.core ? .6 : .92) * dim; g.ps.forEach(p => { const h = p.h; x.fillRect(h[h.length - 2] - .75, h[h.length - 1] - .75, 1.5, 1.5); });
+    const q0 = g.p0; const k = data[q0.ki]; const on = BLOOM.hit && !q0.core && BLOOM.hit.ki === q0.ki && BLOOM.hit.s.i === q0.s.i;
+    const depth = Math.max(.45, Math.min(1, .75 - (g.z / g.ps.length) * .6)) * (1 - p) + p;
+    const dim = (k.paused ? .35 : 1) * (BLOOM.hit && !on ? .45 : 1) * depth * (q0.core ? 1 - p : 1);
+    if (dim <= .01) return;
+    x.strokeStyle = x.fillStyle = q0.core ? BLOOM.muted : BLOOM.cols[q0.s.i % VIZ_N];
+    x.lineWidth = on ? 1.1 : .7; x.globalAlpha = (q0.core ? .25 : on ? .6 : .32 + p * .1) * dim; x.beginPath();
+    g.ps.forEach(q => { const h = q.h; if (h.length < 4) return; x.moveTo(h[0], h[1]); for (let j = 2; j < h.length; j += 2) x.lineTo(h[j], h[j + 1]); }); x.stroke();
+    x.globalAlpha = (q0.core ? .6 : .92) * dim; g.ps.forEach(q => { const h = q.h; x.fillRect(h[h.length - 2] - .75, h[h.length - 1] - .75, 1.5, 1.5); });
   });
+  if (BLOOM.hit && BLOOM.hit.wk != null) { const P = panel(BLOOM.hit.ki); const hx = X(P, BLOOM.hit.wk), hy = Y(P, BLOOM.hit.s.trend[BLOOM.hit.wk]);
+    x.globalAlpha = .5; x.strokeStyle = BLOOM.border; x.beginPath(); x.moveTo(hx + .5, P.t); x.lineTo(hx + .5, P.b); x.stroke(); x.globalAlpha = 1; x.fillStyle = BLOOM.cols[BLOOM.hit.s.i % VIZ_N]; x.beginPath(); x.arc(hx, hy, 5, 0, Math.PI * 2); x.fill(); }
+  if (p >= .999) x.restore();
   x.globalAlpha = 1;
-  const names = el.querySelector('.bl-names'); const nk = W + 'x' + H + data.map(k => k.id).join();
+  /* names under each flower and the "See progress" cue fade out as the morph begins */
+  const names = L.querySelector('.bl-names'); const nk = W + 'x' + H + data.map(k => k.id + k.mastery).join();
   if (BLOOM.namesKey !== nk) { BLOOM.namesKey = nk; names.innerHTML = data.map((k, ki) => `<div class="bl-name" style="left:${W * (ki + .5) / n}px;top:${Math.min(H - 130, cy + S * .62)}px"><div class="bl-child">${esc(k.first)}</div><div class="bl-meta">${esc(k.cls)} · ${k.mastery}% mastery${k.paused ? ' · Paused' : ''}</div></div>`).join(''); }
-  const tp = el.querySelector('.bl-tip');
-  if (!BLOOM.hit) { tp.style.display = 'none'; cv.style.cursor = 'default'; return; }
-  cv.style.cursor = 'pointer'; const k = data[BLOOM.hit.ki], s = BLOOM.hit.s;
-  if (tp.dataset.key !== k.id + s.id) { tp.dataset.key = k.id + s.id; tp.innerHTML = `<div class="t-cap muted">${esc(k.first)} · ${esc(k.cls)}</div><h3><i style="background:${vizVar(s.i)}"></i>${esc(s.name)}</h3><dl>
-    <dt>Mastery</dt><dd>${s.m}%</dd><dt>Accuracy</dt><dd>${s.att ? `${s.cor} / ${s.att} correct` : 'No answers yet'}</dd><dt>Coverage</dt><dd>${s.tbc ? 'Chapters to be confirmed' : `${s.done} / ${s.total} topics`}</dd>
+  names.style.opacity = String(clamp01(1 - p * 4)); const go_ = L.querySelector('.bl-go'); go_.style.opacity = String(clamp01(1 - p * 5)); go_.style.pointerEvents = p < .15 ? 'auto' : 'none';
+  /* hover card */
+  const tp = L.querySelector('.bl-tip');
+  document.body.style.cursor = BLOOM.hit ? 'pointer' : '';
+  if (!BLOOM.hit) { tp.style.display = 'none'; return; }
+  const k = data[BLOOM.hit.ki], s = BLOOM.hit.s; const wkTxt = BLOOM.hit.wk != null ? `<div class="bl-week">Week of ${weekLabels()[BLOOM.hit.wk]}: <strong>${s.trend[BLOOM.hit.wk]}% mastery</strong></div>` : '';
+  const key = k.id + s.id + (BLOOM.hit.wk ?? '');
+  if (tp.dataset.key !== key) { tp.dataset.key = key; tp.innerHTML = `<div class="t-cap muted">${esc(k.first)} · ${esc(k.cls)}</div><h3><i style="background:${vizVar(s.i)}"></i>${esc(s.name)}</h3>${wkTxt}<dl>
+    <dt>Mastery now</dt><dd>${s.m}%</dd><dt>Accuracy</dt><dd>${s.att ? `${s.cor} / ${s.att} correct` : 'No answers yet'}</dd><dt>Coverage</dt><dd>${s.tbc ? 'Chapters to be confirmed' : `${s.done} / ${s.total} topics`}</dd>
     <dt>Practice</dt><dd>${fmtMin(s.min)} in 14 days</dd><dt>Weakest</dt><dd>${s.weak ? esc(s.weak) : 'Nothing flagged'}</dd><dt>Last practised</dt><dd>${s.last ? fmtShort(s.last) : 'Not yet'}</dd></dl><div class="bl-open">Click to open ${esc(s.name)}</div>`; }
-  tp.style.display = 'block'; const w = tp.offsetWidth, h = tp.offsetHeight; let L = BLOOM.mx + 20; if (L + w > W - 12) L = BLOOM.mx - w - 20;
-  tp.style.left = Math.max(12, L) + 'px'; tp.style.top = Math.max(12, Math.min(H - h - 12, BLOOM.my - h / 2)) + 'px';
+  tp.style.display = 'block'; const w = tp.offsetWidth, h = tp.offsetHeight; let Lx = BLOOM.mx + 20; if (Lx + w > W - 12) Lx = BLOOM.mx - w - 20;
+  tp.style.left = Math.max(12, Lx) + 'px'; tp.style.top = Math.max(12, Math.min(H - h - 12, BLOOM.my - h / 2)) + 'px';
 }
 
 /* Particle mastery rings for subject cards: the same visual language at card size. */

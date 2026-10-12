@@ -126,3 +126,7 @@ These were agreed in the prototype chat but never committed. On 11 Oct 2026 they
     - Each subject is a separate petal with its own colour and a gap around it.
     - Hover picks the nearest petal particle within 20 px.
     - The rotation eases to a stop while hovering, and the other petals dim.
+29. **The bloom is part of the Overview page, not a pop-up (12 Oct 2026).**
+    - The flowers are always one scroll up from anywhere on Overview, and scrolling down morphs them into the 8-week mastery chart.
+    - Only the first Overview visit per app load starts at the flowers; later visits start at the chart, so normal navigation isn't slowed down.
+    - The sidebar and top bar are hidden while the flowers fill the screen and fade in as the chart lands.

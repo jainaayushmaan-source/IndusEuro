@@ -613,14 +613,15 @@ The child app is **always light theme**, with **no AI anywhere**: no hints, AI e
   - **Adding a buddy creates a pending request for the parent** in Settings › Buddy requests (with badges and the Overview alert). The child sees it under "Waiting for a grown-up".
   - Approved buddies are listed.
 
-### 5.12 Family bloom: immersive landing on Overview (added 11 Oct 2026)
+### 5.12 Family bloom: immersive landing on Overview (added 11 Oct 2026, scroll morph 12 Oct)
 
-- **When it shows:** the first time a parent lands on Overview after the app loads, before anything else. It covers the **whole screen**: no sidebar, top bar, alerts or prototype tools.
-- **Revisiting:** Overview has a quiet "Family view" button (top right of the content) that opens it again.
+- **Where it lives:** the top of Overview is a full-screen stage. At the top of the page only the flowers show: the sidebar, top bar and prototype tools are hidden, and they fade back in as the chart lands.
+- **First visit vs. later visits:** the first Overview visit after the app loads starts at the flowers. Later visits start at the chart, and the flowers are always **one scroll up** from anywhere on Overview. The chart card also has a "Family view" button that scrolls back up.
+- **Scroll morph:** scrolling down turns each petal into that subject's **mastery line over the last 8 weeks**, in the same colour (from `M.masteryTrend`, the same selector as the subject page). There is one chart per child, side by side. The particles land in the "Mastery over the last 8 weeks" card (axes 0–100% and week labels), which then scrolls with the page. Scrolling up reverses the morph.
 - **What's on screen**
   - One **3D particle flower per child**, side by side, rotating slowly.
   - Under each flower: the child's name, class and overall mastery.
-  - A "Continue to overview" button that fades in after about 2 seconds.
+  - A "See progress" cue that gently bobs; clicking it scrolls down to the chart.
   - Nothing else.
 - **Encoding.** Each subject is one **petal in its own colour** (`--viz-1…6`, in curriculum order).
   - Petal length and particle density = subject mastery.
@@ -631,10 +632,8 @@ The child app is **always light theme**, with **no AI anywhere**: no hints, AI e
   - The rotation eases to a stop and the other petals dim.
   - A card shows: child and class, subject, mastery %, accuracy `correct / total` (or "No answers yet"), coverage (topics practised / total), minutes in the last 14 days, weakest topic, and last practised date.
   - All values come from the same selectors as the rest of Overview.
-- **Click a petal:** switch to that child if needed and open `/overview/subject/[id]`.
-- **Leaving:**
-  - Continue, scrolling down, Esc, Page Down or the down arrow closes the bloom.
-  - The Overview then "lands": its sections rise and fade in one after another.
+- **Hover a line on the chart:** a guide line and dot mark the week, and the same card adds "Week of <date>: N% mastery".
+- **Click a petal or a line:** switch to that child if needed and open `/overview/subject/[id]`.
 - **The Overview uses the same visual language:** the subject cards and the subject drill-down card show mastery as **particle rings** in the subject's colour, with a muted track for the remainder.
 - **Theme and contrast:**
   - The canvas is transparent on `--bg` in light and dark. Colours come only from tokens.
@@ -826,5 +825,5 @@ The team should verify curriculum details; keep them in `/data/curricula/*.ts` s
 - [ ] On the first Overview visit after load, the family bloom fills the whole screen with nothing else on it. "Family view" opens it again.
 - [ ] Each child has a 3D rotating particle flower with one distinctly coloured petal per subject (length and density = mastery, flow = recent minutes).
 - [ ] Hovering a petal pauses the rotation and shows the full subject card. Clicking opens that subject for the right child.
-- [ ] Continue, scrolling, Esc, Page Down or the down arrow lands on Overview. The subject cards use matching particle mastery rings.
+- [ ] Scrolling down morphs each petal into its subject's 8-week mastery line (one chart per child) in the "Mastery over the last 8 weeks" card. Scrolling up returns to the flowers from anywhere on Overview. Later visits start at the chart. The subject cards use matching particle mastery rings.
 - [ ] `--viz-*` tokens pass 3:1 on `--bg` and `--surface` in both themes. The canvas is transparent. Reduced motion is respected, and a hidden table gives the same data.
